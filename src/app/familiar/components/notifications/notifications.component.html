@@ -1,0 +1,48 @@
+<app-familiar-layout>
+  <div class="notifications-container">
+    <h2>Notificaciones</h2>
+
+    <div class="two-column">
+      <div class="card notifications-section">
+        <h3>Centro de notificaciones</h3>
+        <div class="notifications-list">
+          <div *ngFor="let notif of notifications" [class]="'notification-item type-' + notif.type">
+            <div class="notification-icon">
+              <span *ngIf="notif.type === 'urgent'">🔴</span>
+              <span *ngIf="notif.type === 'info'">🔵</span>
+              <span *ngIf="notif.type === 'warning'">🟡</span>
+            </div>
+            <div class="notification-content">
+              <h4>{{ notif.title }}</h4>
+              <p>{{ notif.description }}</p>
+            </div>
+            <div class="notification-actions">
+              <button class="btn-action">📌</button>
+              <button class="btn-action">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card payments-section">
+        <h3>Historial de Pagos</h3>
+        <div class="payments-table">
+          <div class="table-header">
+            <span>Periodo</span>
+            <span>Concepto</span>
+            <span>Estado</span>
+            <span>Acciones</span>
+            <span>Monto</span>
+          </div>
+          <div *ngFor="let payment of paymentHistory" class="table-row">
+            <span class="period">{{ payment.period }}</span>
+            <span class="concept">{{ payment.concept }}</span>
+            <span [class]="'status status-' + payment.status.toLowerCase()">{{ payment.status }}</span>
+            <button class="btn-view">Ver comprobante</button>
+            <span class="amount">{{ payment.amount }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-familiar-layout>

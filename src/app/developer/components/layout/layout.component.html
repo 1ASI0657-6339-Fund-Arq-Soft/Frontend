@@ -1,0 +1,47 @@
+<div class="developer-layout">
+  <nav class="navbar navbar-developer">
+    <div class="navbar-left">
+      <button class="hamburger" (click)="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <h1 class="navbar-brand">AgeCare - Developer</h1>
+    </div>
+    <div class="navbar-right">
+      <span class="user-name">{{ currentUser?.name }}</span>
+      <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <div class="layout-wrapper">
+    <aside class="sidebar" [class.open]="sidebarOpen">
+      <ul class="menu">
+        <li>
+          <a routerLink="/developer/dashboard" routerLinkActive="active" class="menu-item">
+            <span class="label">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/developer/analytics" routerLinkActive="active" class="menu-item">
+            <span class="label">Análitica</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/developer/users" routerLinkActive="active" class="menu-item">
+            <span class="label">Usuarios</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/developer/system" routerLinkActive="active" class="menu-item">
+            <span class="label">Sistema</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

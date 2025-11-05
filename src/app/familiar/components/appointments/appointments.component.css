@@ -1,0 +1,188 @@
+.appointments-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.appointments-container h2 {
+  font-size: 32px;
+  color: #1f2937;
+  margin-bottom: 24px;
+}
+
+.appointments-container h3 {
+  font-size: 18px;
+  color: #1f2937;
+  margin-bottom: 16px;
+}
+
+.calendar-section,
+.appointments-list-section {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-grid {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-nav {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-nav:hover {
+  background: #e5e7eb;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.day-header {
+  text-align: center;
+  font-weight: 600;
+  color: #6b7280;
+  padding: 8px;
+}
+
+.day-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.day-cell:hover {
+  border-color: #325295;
+  color: #325295;
+}
+
+.day-cell.with-appointment {
+  background: #dbeafe;
+  color: #325295;
+  font-weight: 600;
+  border-color: #325295;
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.appointment-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 16px;
+  background: #f9fafb;
+}
+
+.appointment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.appointment-type {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-confirmada {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.status-pendiente {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.appointment-body {
+  margin-bottom: 16px;
+}
+
+.appointment-body p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.appointment-body strong {
+  color: #1f2937;
+}
+
+.appointment-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: #dbeafe;
+  color: #325295;
+  border-color: #325295;
+}
+
+.btn-edit:hover {
+  background: #bfdbfe;
+}
+
+.btn-delete {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.btn-delete:hover {
+  background: #fecaca;
+}

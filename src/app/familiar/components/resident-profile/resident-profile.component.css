@@ -1,0 +1,13 @@
+.resident-profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.resident-profile-container h2 {
+  color: #1f2937;
+  margin-top: 0;
+}

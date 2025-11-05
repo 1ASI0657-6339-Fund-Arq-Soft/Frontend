@@ -1,0 +1,20 @@
+import type { Routes } from "@angular/router"
+
+export const CUIDADOR_ROUTES: Routes = [
+  {
+    path: "dashboard",
+    loadComponent: () => import("./components/dashboard/dashboard.component").then((m) => m.DashboardComponent),
+  },
+  {
+    path: "patients",
+    loadComponent: () => import("./components/patients/patients.component").then((m) => m.PatientsComponent),
+  },
+  {
+    path: "tasks",
+    loadComponent: () => import("./components/tasks/tasks.component").then((m) => m.TasksComponent),
+  },
+  {
+    path: "reports",
+    loadComponent: () => import("./components/reports/reports.component").then((m) => m.ReportsComponent),
+  },
+]

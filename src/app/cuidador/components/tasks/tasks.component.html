@@ -1,0 +1,21 @@
+<app-cuidador-layout>
+  <div class="tasks-container">
+    <h2>Mis Tareas</h2>
+
+    <div class="tasks-list">
+      <div *ngFor="let task of tasks" [class]="'task-card ' + (task.completed ? 'completed' : '')">
+        <div class="task-checkbox">
+          <input type="checkbox" [checked]="task.completed" (change)="completeTask(task.id)">
+        </div>
+        <div class="task-content">
+          <h3>{{ task.title }}</h3>
+          <p class="task-patient">Paciente: {{ task.patient }}</p>
+          <p class="task-time">Hora: {{ task.time }}</p>
+        </div>
+        <div [class]="'task-priority priority-' + task.priority.toLowerCase()">
+          {{ task.priority }}
+        </div>
+      </div>
+    </div>
+  </div>
+</app-cuidador-layout>

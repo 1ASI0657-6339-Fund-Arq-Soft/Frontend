@@ -1,0 +1,94 @@
+<div class="login-container">
+  <div class="login-wrapper">
+    <div class="login-brand">
+      <div class="brand-content">
+        <h1>AgeCare</h1>
+        <p>Sistema integral de gestión y cuidado para adultos mayores</p>
+        <ul class="brand-features">
+          <li>Seguro y confiable</li>
+          <li>Monitoreo 24/7</li>
+          <li>Comunicación familiar</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="login-form-wrapper">
+      <div class="form-container">
+        <h2>Iniciar sesión</h2>
+        <p class="form-subtitle">Acceda a su cuenta de usuario</p>
+
+        <div *ngIf="error" class="alert alert-error">
+          {{ error }}
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="email">
+              <span class="icon">👤</span>
+              Usuario
+            </label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="Ingrese su usuario"
+              class="form-input"
+              [class.is-invalid]="submitted && f['email'].errors"
+            />
+            <div *ngIf="submitted && f['email'].errors" class="error-text">
+              <span *ngIf="f['email'].errors['required']">El email es requerido</span>
+              <span *ngIf="f['email'].errors['email']">Ingrese un email válido</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">
+              <span class="icon">🔒</span>
+              Contraseña
+            </label>
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              placeholder="Ingrese su contraseña"
+              class="form-input"
+              [class.is-invalid]="submitted && f['password'].errors"
+            />
+            <div *ngIf="submitted && f['password'].errors" class="error-text">
+              <span *ngIf="f['password'].errors['required']">La contraseña es requerida</span>
+              <span *ngIf="f['password'].errors['minlength']">Mínimo 6 caracteres</span>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="loading"
+          >
+            <span *ngIf="!loading">Ingresar al Sistema</span>
+            <span *ngIf="loading">Cargando...</span>
+          </button>
+        </form>
+
+        <div class="quick-login">
+          <p class="quick-login-title">Acceso rápido para pruebas:</p>
+          <div class="quick-buttons">
+            <button type="button" (click)="fillFamiliarCredentials()" class="btn-quick btn-familiar">
+              👨‍👩‍👧 Familiar
+            </button>
+            <button type="button" (click)="fillCuidadorCredentials()" class="btn-quick btn-cuidador">
+              👩‍⚕️ Cuidador
+            </button>
+            <button type="button" (click)="fillDeveloperCredentials()" class="btn-quick btn-developer">
+              👨‍💻 Developer
+            </button>
+          </div>
+        </div>
+
+        <div class="register-link">
+          <a href="/register">Registrate</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

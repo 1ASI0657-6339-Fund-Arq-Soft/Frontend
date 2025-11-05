@@ -1,0 +1,56 @@
+<app-familiar-layout>
+  <div class="medical-records-container">
+    <h2>Perfil del Residente</h2>
+
+    <div class="records-grid">
+      <div class="card info-card">
+        <h3>Información Personal</h3>
+        <div class="info-content">
+          <div class="info-item">
+            <label>Nombre</label>
+            <span>{{ residentInfo.name }}</span>
+          </div>
+          <div class="info-item">
+            <label>Edad</label>
+            <span>{{ residentInfo.age }} años</span>
+          </div>
+          <div class="info-item">
+            <label>Tipo de Sangre</label>
+            <span>{{ residentInfo.bloodType }}</span>
+          </div>
+          <div class="info-item">
+            <label>Contacto de Emergencia</label>
+            <span>{{ residentInfo.emergencyContact }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Condiciones de Salud</h3>
+        <div class="conditions-list">
+          <div *ngFor="let condition of residentInfo.conditions" class="condition-badge">
+            {{ condition }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Medicamentos Actuales</h3>
+        <div class="medications-list">
+          <div *ngFor="let med of residentInfo.currentMedications" class="medication-item">
+            <h4>{{ med.name }}</h4>
+            <p>Dosis: {{ med.dosage }}</p>
+            <p>Frecuencia: {{ med.frequency }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Alergias</h3>
+        <div class="allergies-content">
+          <p>{{ residentInfo.allergies }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-familiar-layout>

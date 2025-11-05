@@ -1,0 +1,47 @@
+<div class="cuidador-layout">
+  <nav class="navbar navbar-cuidador">
+    <div class="navbar-left">
+      <button class="hamburger" (click)="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <h1 class="navbar-brand">AgeCare - Cuidador</h1>
+    </div>
+    <div class="navbar-right">
+      <span class="user-name">{{ currentUser?.name }}</span>
+      <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <div class="layout-wrapper">
+    <aside class="sidebar" [class.open]="sidebarOpen">
+      <ul class="menu">
+        <li>
+          <a routerLink="/cuidador/dashboard" routerLinkActive="active" class="menu-item">
+            <span class="label">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/cuidador/patients" routerLinkActive="active" class="menu-item">
+            <span class="label">Mis Pacientes</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/cuidador/tasks" routerLinkActive="active" class="menu-item">
+            <span class="label">Tareas</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/cuidador/reports" routerLinkActive="active" class="menu-item">
+            <span class="label">Reportes</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

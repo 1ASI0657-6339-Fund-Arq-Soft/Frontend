@@ -1,0 +1,141 @@
+<div class="register-container">
+  <div class="register-wrapper">
+    <div class="register-brand">
+      <div class="brand-content">
+        <h1>AgeCare</h1>
+        <p>Sistema integral de gestión y cuidado para adultos mayores</p>
+        <ul class="brand-features">
+          <li>Seguro y confiable</li>
+          <li>Monitoreo 24/7</li>
+          <li>Comunicación familiar</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="register-form-wrapper">
+      <div class="form-container">
+        <h2>Registrate</h2>
+        <p class="form-subtitle">Acceso a la plataforma de gestión</p>
+
+        <div *ngIf="error" class="alert alert-error">
+          {{ error }}
+        </div>
+
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="name">
+              <span class="icon">👤</span>
+              Usuario
+            </label>
+            <input
+              type="text"
+              id="name"
+              formControlName="name"
+              placeholder="Ingrese su usuario"
+              class="form-input"
+              [class.is-invalid]="submitted && f['name'].errors"
+            />
+            <div *ngIf="submitted && f['name'].errors" class="error-text">
+              <span *ngIf="f['name'].errors['required']">El nombre es requerido</span>
+              <span *ngIf="f['name'].errors['minlength']">Mínimo 3 caracteres</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">
+              <span class="icon">📧</span>
+              Correo
+            </label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="Ingrese su correo"
+              class="form-input"
+              [class.is-invalid]="submitted && f['email'].errors"
+            />
+            <div *ngIf="submitted && f['email'].errors" class="error-text">
+              <span *ngIf="f['email'].errors['required']">El email es requerido</span>
+              <span *ngIf="f['email'].errors['email']">Ingrese un email válido</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">
+              <span class="icon">🔒</span>
+              Contraseña
+            </label>
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              placeholder="Ingrese su contraseña"
+              class="form-input"
+              [class.is-invalid]="submitted && f['password'].errors"
+            />
+            <div *ngIf="submitted && f['password'].errors" class="error-text">
+              <span *ngIf="f['password'].errors['required']">La contraseña es requerida</span>
+              <span *ngIf="f['password'].errors['minlength']">Mínimo 6 caracteres</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">
+              <span class="icon">🔒</span>
+              Confirma Contraseña
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              formControlName="confirmPassword"
+              placeholder="Ingrese su contraseña"
+              class="form-input"
+              [class.is-invalid]="submitted && f['confirmPassword'].errors"
+            />
+            <div *ngIf="submitted && f['confirmPassword'].errors" class="error-text">
+              <span *ngIf="f['confirmPassword'].errors['required']">Debe confirmar la contraseña</span>
+              <span *ngIf="f['confirmPassword'].errors['passwordMismatch']">Las contraseñas no coinciden</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="role">
+              <span class="icon">👥</span>
+              Tipo de Usuario
+            </label>
+            <select
+              id="role"
+              formControlName="role"
+              class="form-input"
+              [class.is-invalid]="submitted && f['role'].errors"
+            >
+              <option value="" disabled>Seleccione su rol</option>
+              <option *ngFor="let role of roles" [value]="role.value">
+                {{ role.label }}
+              </option>
+            </select>
+            <div *ngIf="submitted && f['role'].errors" class="error-text">
+              <span *ngIf="f['role'].errors['required']">Debe seleccionar un rol</span>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="loading"
+          >
+            <span *ngIf="!loading">Ingresar al Sistema</span>
+            <span *ngIf="loading">Registrando...</span>
+          </button>
+        </form>
+
+        <div class="login-link">
+          <p>¿Ya tiene cuenta?</p>
+          <button type="button" (click)="goToLogin()" class="link-button">
+            Inicia sesión aquí
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

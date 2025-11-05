@@ -1,0 +1,58 @@
+<div class="familiar-layout">
+  <nav class="navbar">
+    <div class="navbar-left">
+      <button class="hamburger" (click)="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <h1 class="navbar-brand">AgeCare</h1>
+    </div>
+    <div class="navbar-right">
+      <span class="user-name">{{ currentUser?.name }}</span>
+      <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar" [class.open]="sidebarOpen">
+      <ul class="menu">
+        <li>
+          <a routerLink="/familiar/dashboard" routerLinkActive="active" class="menu-item">
+            <span class="label">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/familiar/notifications" routerLinkActive="active" class="menu-item">
+            <span class="label">Notificaciones</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/familiar/appointments" routerLinkActive="active" class="menu-item">
+            <span class="label">Citas Médicas</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/familiar/medical-records" routerLinkActive="active" class="menu-item">
+            <span class="label">Perfil del Residente</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/familiar/pages" routerLinkActive="active" class="menu-item">
+            <span class="label">Pagos</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/familiar/settings" routerLinkActive="active" class="menu-item">
+            <span class="label">Configuración</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

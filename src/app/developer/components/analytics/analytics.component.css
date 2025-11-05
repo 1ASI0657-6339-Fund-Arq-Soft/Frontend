@@ -1,0 +1,88 @@
+.analytics-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.analytics-container h2 {
+  font-size: 32px;
+  color: #1f2937;
+  margin-bottom: 24px;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+  font-size: 18px;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+  font-weight: 600;
+}
+
+.chart-placeholder {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 250px;
+  gap: 16px;
+}
+
+.chart-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 8px;
+}
+
+.bar-label {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+  order: 3;
+}
+
+.bar-container {
+  width: 100%;
+  height: 150px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bar {
+  width: 100%;
+  background: #325295;
+  border-radius: 4px 4px 0 0;
+  transition: all 0.3s;
+}
+
+.bar:hover {
+  background: #325295;
+}
+
+.bar-green {
+  background: #325295;
+}
+
+.bar-green:hover {
+  background: #325295;
+}
+
+.bar-value {
+  font-size: 12px;
+  color: #1f2937;
+  font-weight: 600;
+  order: 2;
+}

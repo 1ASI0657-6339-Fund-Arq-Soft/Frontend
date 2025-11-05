@@ -1,0 +1,24 @@
+<app-cuidador-layout>
+  <div class="patients-container">
+    <h2>Mis Pacientes</h2>
+
+    <div class="patients-table">
+      <div class="table-header">
+        <span>Nombre</span>
+        <span>Edad</span>
+        <span>Habitación</span>
+        <span>Condición</span>
+        <span>Medicamentos</span>
+        <span>Acciones</span>
+      </div>
+      <div *ngFor="let patient of patients" class="table-row">
+        <span>{{ patient.name }}</span>
+        <span>{{ patient.age }} años</span>
+        <span>{{ patient.room }}</span>
+        <span [class]="'condition condition-' + patient.condition.toLowerCase()">{{ patient.condition }}</span>
+        <span>{{ patient.medications }}</span>
+        <button class="btn-view">Ver Detalle</button>
+      </div>
+    </div>
+  </div>
+</app-cuidador-layout>

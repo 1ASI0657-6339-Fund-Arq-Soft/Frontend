@@ -1,0 +1,64 @@
+<app-familiar-layout>
+  <div class="dashboard">
+    <h2>Dashboard</h2>
+
+    <div class="dashboard-grid">
+      <div class="card stats-card">
+        <div class="stat-item">
+          <div class="stat-value">3</div>
+          <div class="stat-label">Próximas citas</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">7</div>
+          <div class="stat-label">Notificaciones</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">1</div>
+          <div class="stat-label">Páginas Pendientes</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">Estable</div>
+          <div class="stat-label">Estado general</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Actividad Reciente</h3>
+        <div class="activity-list">
+          <div class="activity-item" *ngFor="let notif of recentNotifications">
+            <span class="activity-icon" [class]="notif.type">✓</span>
+            <div class="activity-content">
+              <p class="activity-title">{{ notif.title }}</p>
+              <p class="activity-message">{{ notif.message }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Próximas Citas</h3>
+        <div class="appointments-list">
+          <div class="appointment-item" *ngFor="let apt of upcomingAppointments">
+            <div class="appointment-date">{{ apt.date | slice:5:10 }}</div>
+            <div class="appointment-details">
+              <p class="appointment-title">{{ apt.title }}</p>
+              <p class="appointment-doctor">{{ apt.doctor }}</p>
+            </div>
+            <div class="appointment-time">{{ apt.time }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Información del Residente</h3>
+        <div class="resident-info">
+          <p><strong>Nombre:</strong> {{ residentInfo.name }}</p>
+          <p><strong>Edad:</strong> {{ residentInfo.age }} años</p>
+          <p><strong>Estado:</strong> {{ residentInfo.healthStatus }}</p>
+          <p><strong>Último Chequeo:</strong> {{ residentInfo.lastCheckup }}</p>
+          <p><strong>Condiciones:</strong> {{ residentInfo.conditions.join(', ') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-familiar-layout>

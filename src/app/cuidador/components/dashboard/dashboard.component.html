@@ -1,0 +1,60 @@
+<app-cuidador-layout>
+  <div class="dashboard">
+    <h2>Dashboard Cuidador</h2>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="stat-value">{{ patientsAssigned }}</div>
+          <div class="stat-label">Pacientes Asignados</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✓</div>
+        <div class="stat-info">
+          <div class="stat-value">{{ tasksCompleted }}</div>
+          <div class="stat-label">Tareas Completadas</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="stat-value">{{ tasksTodo }}</div>
+          <div class="stat-label">Tareas Pendientes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <div class="card">
+        <h3>Estado de Pacientes</h3>
+        <div class="patients-list">
+          <div *ngFor="let patient of patients" class="patient-item" [class.alert]="patient.status !== 'Bien'">
+            <div class="patient-info">
+              <p class="patient-name">{{ patient.name }}</p>
+              <p class="patient-status">{{ patient.status }}</p>
+            </div>
+            <div class="patient-time">{{ patient.lastCheck }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Próximas Acciones</h3>
+        <div class="actions-list">
+          <div class="action-item">
+            <span class="action-time">10:00</span>
+            <span class="action-desc">Medicamento - Paciente 1</span>
+          </div>
+          <div class="action-item">
+            <span class="action-time">14:00</span>
+            <span class="action-desc">Cambio de vendaje - Paciente 2</span>
+          </div>
+          <div class="action-item">
+            <span class="action-time">16:30</span>
+            <span class="action-desc">Terapia física - Paciente 3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-cuidador-layout>

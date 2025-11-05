@@ -1,0 +1,70 @@
+.patients-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.patients-container h2 {
+  font-size: 32px;
+  color: #1f2937;
+  margin-bottom: 24px;
+}
+
+.patients-table {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 200px 100px 100px 150px 120px 130px;
+  gap: 12px;
+  padding: 16px;
+  background: #f3f4f6;
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 200px 100px 100px 150px 120px 130px;
+  gap: 12px;
+  padding: 16px;
+  border-top: 1px solid #e5e7eb;
+  align-items: center;
+}
+
+.condition {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.condition-estable {
+  background: #d1fae5;
+  color: #325295;
+}
+
+.condition-monitoreado {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.btn-view {
+  background: #d1fae5;
+  color: #325295;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-view:hover {
+  background: #325295;
+}
