@@ -1,0 +1,32 @@
+<app-familiar-layout>
+  <div class="food-page">
+    <h2>Registro de Consumos</h2>
+
+    <div class="meal-section card">
+      <h3>Desayuno</h3>
+      <div *ngFor="let e of grouped.breakfast" class="entry">
+        <div class="desc">{{ e.description }}</div>
+        <div class="meta">{{ e.date }} • {{ e.time }}</div>
+      </div>
+      <div *ngIf="grouped.breakfast.length === 0">No hay registros</div>
+    </div>
+
+    <div class="meal-section card">
+      <h3>Almuerzo</h3>
+      <div *ngFor="let e of grouped.lunch" class="entry">
+        <div class="desc">{{ e.description }}</div>
+        <div class="meta">{{ e.date }} • {{ e.time }}</div>
+      </div>
+      <div *ngIf="grouped.lunch.length === 0">No hay registros</div>
+    </div>
+
+    <div class="meal-section card">
+      <h3>Cena</h3>
+      <div *ngFor="let e of grouped.dinner" class="entry">
+        <div class="desc">{{ e.description }}</div>
+        <div class="meta">{{ e.date }} • {{ e.time }}</div>
+      </div>
+      <div *ngIf="grouped.dinner.length === 0">No hay registros</div>
+    </div>
+  </div>
+</app-familiar-layout>

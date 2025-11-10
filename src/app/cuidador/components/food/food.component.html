@@ -1,0 +1,47 @@
+<app-cuidador-layout>
+  <div class="food-admin">
+    <h2>Gestión de Alimentos</h2>
+
+    <div class="form card">
+      <label>Destinatario</label>
+      <select [(ngModel)]="selectedFamiliaId">
+        <option [value]="null">Seleccione un familiar</option>
+        <option *ngFor="let f of familiares" [value]="f.id">{{ f.name }}</option>
+      </select>
+
+      <label>Comida</label>
+      <select [(ngModel)]="meal">
+        <option value="breakfast">Desayuno</option>
+        <option value="lunch">Almuerzo</option>
+        <option value="dinner">Cena</option>
+      </select>
+
+      <label>Descripción</label>
+      <input type="text" [(ngModel)]="description" />
+
+      <label>Fecha</label>
+      <input type="date" [(ngModel)]="date" />
+
+      <label>Hora</label>
+      <input type="time" [(ngModel)]="time" />
+
+      <button class="btn" (click)="save()">{{ editingId ? 'Guardar' : 'Agregar' }}</button>
+    </div>
+
+    <div class="entries">
+      <div *ngFor="let e of entries" class="card entry">
+        <div class="entry-main">
+          <div class="entry-title">{{ e.meal | titlecase }}</div>
+          <div class="entry-desc">{{ e.description }}</div>
+        </div>
+        <div class="entry-meta">
+          <div class="entry-date">{{ e.date }} <span class="entry-time">{{ e.time }}</span></div>
+          <div class="entry-actions">
+            <button (click)="startEdit(e)">Editar</button>
+            <button (click)="remove(e.id)">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-cuidador-layout>

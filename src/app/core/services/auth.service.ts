@@ -137,4 +137,12 @@ export class AuthService {
   private generateMockToken(): string {
     return "mock_token_" + Math.random().toString(36).substr(2, 9)
   }
+
+  getAllUsers(): User[] {
+    return this.mockUsers.map((u) => ({ id: u.id, email: u.email, name: u.name, role: u.role }))
+  }
+
+  getFamiliares(): User[] {
+    return this.getAllUsers().filter((u) => u.role === 'familiar')
+  }
 }

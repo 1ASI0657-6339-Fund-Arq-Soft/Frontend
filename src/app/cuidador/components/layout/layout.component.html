@@ -28,6 +28,21 @@
           </a>
         </li>
         <li>
+          <a routerLink="/cuidador/notifications" routerLinkActive="active" class="menu-item">
+            <span class="label">Notificaciones</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/cuidador/food" routerLinkActive="active" class="menu-item">
+            <span class="label">Alimentos</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/cuidador/payments" routerLinkActive="active" class="menu-item">
+            <span class="label">Pagos</span>
+          </a>
+        </li>
+        <li>
           <a routerLink="/cuidador/tasks" routerLinkActive="active" class="menu-item">
             <span class="label">Tareas</span>
           </a>
@@ -41,6 +56,7 @@
     </aside>
 
     <main class="main-content">
+      <ng-content></ng-content>
       <router-outlet></router-outlet>
     </main>
   </div>

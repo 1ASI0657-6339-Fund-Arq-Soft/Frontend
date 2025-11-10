@@ -22,6 +22,7 @@ export class LayoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
+    console.log('[Layout Cuidador] initialized, user=', this.currentUser)
   }
 
   toggleSidebar(): void {

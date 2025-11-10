@@ -1,0 +1,43 @@
+<app-cuidador-layout>
+  <div class="notifications-admin">
+    <h2>Notificaciones</h2>
+
+    <div class="create-form card">
+      <label>Destinatario</label>
+      <select [(ngModel)]="recipientId">
+        <option [value]="null">Seleccione un familiar</option>
+        <option *ngFor="let f of familiares" [value]="f.id">{{ f.name }}</option>
+      </select>
+
+      <label>Título</label>
+      <input type="text" [(ngModel)]="title" />
+
+      <label>Descripción</label>
+      <textarea rows="3" [(ngModel)]="description"></textarea>
+
+      <label>Tipo</label>
+      <select [(ngModel)]="type">
+        <option value="info">Info</option>
+        <option value="urgent">Urgente</option>
+        <option value="warning">Advertencia</option>
+        <option value="success">Éxito</option>
+      </select>
+
+      <button class="btn" (click)="create()">Crear Notificación</button>
+    </div>
+
+    <div class="list">
+      <div *ngFor="let n of notifications" class="card item">
+        <div class="item-main">
+          <strong>{{ n.title }}</strong>
+          <div class="item-desc">{{ n.description }}</div>
+        </div>
+        <div class="item-meta">
+          <div>{{ n.date }}</div>
+          <div class="small">De: {{ n.sender || 'Sistema' }}</div>
+          <div><button (click)="markAsRead(n.id)">Marcar leído</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-cuidador-layout>

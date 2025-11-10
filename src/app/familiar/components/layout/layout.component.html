@@ -29,6 +29,16 @@
           </a>
         </li>
         <li>
+          <a routerLink="/familiar/payments" routerLinkActive="active" class="menu-item">
+            <span class="label">Pagos</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/familiar/food" routerLinkActive="active" class="menu-item">
+            <span class="label">Alimentos</span>
+          </a>
+        </li>
+        <li>
           <a routerLink="/familiar/appointments" routerLinkActive="active" class="menu-item">
             <span class="label">Citas Médicas</span>
           </a>
@@ -36,11 +46,6 @@
         <li>
           <a routerLink="/familiar/medical-records" routerLinkActive="active" class="menu-item">
             <span class="label">Perfil del Residente</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/familiar/pages" routerLinkActive="active" class="menu-item">
-            <span class="label">Pagos</span>
           </a>
         </li>
         <li>
@@ -52,6 +57,7 @@
     </aside>
 
     <main class="main-content">
+      <ng-content></ng-content>
       <router-outlet></router-outlet>
     </main>
   </div>

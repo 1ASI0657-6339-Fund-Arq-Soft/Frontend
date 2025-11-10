@@ -1,0 +1,37 @@
+<app-cuidador-layout>
+  <div class="payments-dashboard">
+    <h2>Solicitudes de Pago</h2>
+
+    <div class="create-form card">
+      <label>Destinatario</label>
+      <select [(ngModel)]="selectedFamiliaId">
+        <option [value]="null">Seleccione un familiar</option>
+        <option *ngFor="let f of familiares" [value]="f.id">{{ f.name }}</option>
+      </select>
+
+      <label>Periodo</label>
+      <input type="text" [(ngModel)]="period" />
+
+      <label>Concepto</label>
+      <input type="text" [(ngModel)]="concept" />
+
+      <label>Monto</label>
+      <input type="text" [(ngModel)]="amount" />
+
+      <button class="btn" (click)="createRequest()">Crear Solicitud</button>
+    </div>
+
+    <div class="requests-list">
+      <div *ngFor="let p of payments" class="card request-item">
+        <div class="request-main">
+          <div class="request-title">{{ p.concept }}</div>
+          <div class="request-amount">{{ p.amount }}</div>
+        </div>
+        <div class="request-meta">
+          <div>{{ p.period }} • {{ p.createdAt | date:'short' }}</div>
+          <div class="status">{{ p.status }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-cuidador-layout>

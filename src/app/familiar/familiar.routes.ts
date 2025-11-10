@@ -16,6 +16,14 @@ export const FAMILIAR_ROUTES: Routes = [
       import("./components/notifications/notifications.component").then((m) => m.NotificationsComponent),
   },
   {
+    path: "payments",
+    loadComponent: () => import("./components/payments/payments.component").then((m) => m.PaymentsComponent),
+  },
+  {
+    path: "food",
+    loadComponent: () => import("./components/food/food.component").then((m) => m.FoodComponent),
+  },
+  {
     path: "medical-records",
     loadComponent: () =>
       import("./components/medical-records/medical-records.component").then((m) => m.MedicalRecordsComponent),

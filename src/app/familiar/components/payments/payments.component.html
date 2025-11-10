@@ -1,0 +1,23 @@
+<app-familiar-layout>
+  <div class="payments-page">
+    <h2>Pagos</h2>
+
+    <div class="payments-list">
+      <div *ngFor="let p of payments" class="card payment-item">
+        <div class="payment-left">
+          <div class="period">{{ p.period }}</div>
+          <div class="concept">{{ p.concept }}</div>
+        </div>
+        <div class="payment-right">
+          <div class="amount">{{ p.amount }}</div>
+          <div class="status">{{ p.status }}</div>
+          <div class="meta">{{ p.createdAt | date:'short' }}</div>
+          <div class="actions">
+            <button *ngIf="p.status !== 'paid'" (click)="pay(p)">Pagar</button>
+            <a *ngIf="p.receiptUrl" [href]="p.receiptUrl" target="_blank">Ver comprobante</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-familiar-layout>
