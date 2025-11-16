@@ -1,33 +1,31 @@
-<app-developer-layout>
-  <div class="analytics-container">
-    <h2>Análitica del Sistema</h2>
+<div class="analytics-container">
+  <h2>Análitica del Sistema</h2>
 
-    <div class="charts-grid">
-      <div class="card">
-        <h3>Crecimiento de Usuarios</h3>
-        <div class="chart-placeholder">
-          <div class="chart-bar" *ngFor="let data of chartData">
-            <div class="bar-label">{{ data.date }}</div>
-            <div class="bar-container">
-              <div class="bar" [style.height.%]="(data.users / 1000) * 100"></div>
-            </div>
-            <div class="bar-value">{{ data.users }}</div>
+  <div class="charts-grid">
+    <div class="card">
+      <h3>Crecimiento de Usuarios</h3>
+      <div class="chart-placeholder">
+        <div class="chart-bar" *ngFor="let data of chartData">
+          <div class="bar-label">{{ data.date }}</div>
+          <div class="bar-container">
+            <div class="bar" [style.height.%]="(data.users / 1000) * 100"></div>
           </div>
+          <div class="bar-value">{{ data.users }}</div>
         </div>
       </div>
+    </div>
 
-      <div class="card">
-        <h3>Citas Registradas</h3>
-        <div class="chart-placeholder">
-          <div class="chart-bar" *ngFor="let data of chartData">
-            <div class="bar-label">{{ data.date }}</div>
-            <div class="bar-container">
-              <div class="bar bar-green" [style.height.%]="(data.appointments / 500) * 100"></div>
-            </div>
-            <div class="bar-value">{{ data.appointments }}</div>
+    <div class="card">
+      <h3>Citas Registradas</h3>
+      <div class="chart-placeholder">
+        <div class="chart-bar" *ngFor="let data of chartData">
+          <div class="bar-label">{{ data.date }}</div>
+          <div class="bar-container">
+            <div class="bar bar-green" [style.height.%]="(data.appointments / 500) * 100"></div>
           </div>
+          <div class="bar-value">{{ data.appointments }}</div>
         </div>
       </div>
     </div>
   </div>
-</app-developer-layout>
+</div>
