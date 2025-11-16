@@ -1,4 +1,5 @@
 import type { Routes } from "@angular/router"
+import { NursesComponent } from "./nurses/nurses.component"
 
 export const CUIDADOR_ROUTES: Routes = [
   {
@@ -28,5 +29,9 @@ export const CUIDADOR_ROUTES: Routes = [
   {
     path: "reports",
     loadComponent: () => import("./components/reports/reports.component").then((m) => m.ReportsComponent),
+  },
+  {
+    path: "nurses",
+    component: NursesComponent,
   },
 ]

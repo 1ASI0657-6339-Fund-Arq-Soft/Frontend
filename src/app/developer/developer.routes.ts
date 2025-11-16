@@ -21,4 +21,9 @@ export const DEVELOPER_ROUTES: Routes = [
     loadComponent: () =>
       import("./components/users/users.component").then((m) => m.UsersComponent),
   },
+  {
+    path: "appointments",
+    loadComponent: () =>
+      import("./appointments/appointments.component").then((m) => m.AppointmentsComponent),
+  },
 ];

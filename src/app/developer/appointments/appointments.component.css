@@ -1,0 +1,88 @@
+.appointments-container {
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  margin-bottom: 25px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.nav-btn {
+  border: none;
+  background: #eef2ff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+}
+
+.day-card {
+  background: #f8f9ff;
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+  font-size: 18px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.day-card:hover {
+  background: #e9edff;
+}
+
+.day-card.selected {
+  background: #dce5ff;
+  border-color: #5a73ff;
+}
+
+.create-form input,
+.create-form textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 12px;
+}
+
+.btn {
+  background: #4b6bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.appointment-item {
+  padding: 15px;
+}
+
+.appointment-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.appointment-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.appointment-date {
+  color: #666;
+}
