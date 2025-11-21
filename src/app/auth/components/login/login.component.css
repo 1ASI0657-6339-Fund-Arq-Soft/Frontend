@@ -199,9 +199,7 @@
   background: #dbeafe;
 }
 
-.btn-developer:hover {
-  background: #dbeafe;
-}
+/* Developer button styles removed */
 
 .register-link {
   text-align: center;

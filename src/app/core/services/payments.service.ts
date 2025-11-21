@@ -36,6 +36,19 @@ export class PaymentsService {
     this.saveToStorage(updated as Payment[])
   }
 
+  updatePayment(id: string, patch: Partial<Payment>): Payment | null {
+    const updated = this.paymentsSubject.value.map((p) => (p.id === id ? ({ ...p, ...patch } as Payment) : p))
+    this.paymentsSubject.next(updated as Payment[])
+    this.saveToStorage(updated as Payment[])
+    return updated.find((p) => p.id === id) || null
+  }
+
+  deletePayment(id: string): void {
+    const filtered = this.paymentsSubject.value.filter((p) => p.id !== id)
+    this.paymentsSubject.next(filtered)
+    this.saveToStorage(filtered)
+  }
+
   clearAll() {
     this.paymentsSubject.next([])
     localStorage.removeItem('payments')

@@ -11,8 +11,8 @@ export const CUIDADOR_ROUTES: Routes = [
     loadComponent: () => import("./components/patients/patients.component").then((m) => m.PatientsComponent),
   },
   {
-    path: "tasks",
-    loadComponent: () => import("./components/tasks/tasks.component").then((m) => m.TasksComponent),
+    path: "citas",
+    loadComponent: () => import("./components/citas/citas.component").then((m) => m.CitasComponent),
   },
   {
     path: "payments",
@@ -26,10 +26,7 @@ export const CUIDADOR_ROUTES: Routes = [
     path: "food",
     loadComponent: () => import("./components/food/food.component").then((m) => m.FoodComponent),
   },
-  {
-    path: "reports",
-    loadComponent: () => import("./components/reports/reports.component").then((m) => m.ReportsComponent),
-  },
+  
   {
     path: "nurses",
     component: NursesComponent,

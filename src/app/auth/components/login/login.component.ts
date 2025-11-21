@@ -29,6 +29,13 @@ export class LoginComponent {
     })
   }
 
+  fillDoctorCredentials(): void {
+    this.loginForm.patchValue({
+      email: 'doctor@test.com',
+      password: 'password123',
+    })
+  }
+
   get f() {
     return this.loginForm.controls
   }
@@ -49,8 +56,8 @@ export class LoginComponent {
           this.router.navigate(["/familiar/dashboard"])
         } else if (user.role === "cuidador") {
           this.router.navigate(["/cuidador/dashboard"])
-        } else if (user.role === "developer") {
-          this.router.navigate(["/developer/dashboard"])
+        } else if (user.role === "doctor") {
+          this.router.navigate(["/doctor/gestion-citas"])
         }
       },
       error: (error) => {
@@ -74,10 +81,5 @@ export class LoginComponent {
     })
   }
 
-  fillDeveloperCredentials(): void {
-    this.loginForm.patchValue({
-      email: "developer@test.com",
-      password: "password123",
-    })
-  }
+  // Developer role removed
 }

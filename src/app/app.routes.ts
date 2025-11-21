@@ -21,9 +21,9 @@ export const routes: Routes = [
       import('./cuidador/cuidador.routes').then((m) => m.CUIDADOR_ROUTES),
   },
   {
-    path: 'developer',
+    path: 'doctor',
     loadChildren: () =>
-      import('./developer/developer.routes').then((m) => m.DEVELOPER_ROUTES),
+      import('./doctor/doctor.routes').then((m) => m.DOCTOR_ROUTES),
   },
   {
     path: '**',

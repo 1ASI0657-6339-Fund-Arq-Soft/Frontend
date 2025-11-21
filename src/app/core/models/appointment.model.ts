@@ -4,4 +4,6 @@ export interface Appointment {
   start: string;
   end: string;
   description?: string;
+  status?: 'pending' | 'accepted' | 'rejected' | 'finalized' | string;
+  specialty?: string;
 }

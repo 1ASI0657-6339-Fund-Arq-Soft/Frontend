@@ -20,7 +20,7 @@ export class RegisterComponent {
   roles = [
     { value: "familiar", label: "Familiar" },
     { value: "cuidador", label: "Cuidador" },
-    { value: "developer", label: "Developer" },
+    { value: "doctor", label: "Doctor" },
   ]
 
   constructor(
@@ -35,9 +35,26 @@ export class RegisterComponent {
         password: ["", [Validators.required, Validators.minLength(6)]],
         confirmPassword: ["", Validators.required],
         role: ["familiar", Validators.required],
+        // optional nested resident data for `familiar` role
+        resident: this.formBuilder.group({
+          name: [""],
+          birthDate: [""],
+          medicalId: [""],
+        }),
+        // optional nested doctor verification data
+        doctor: this.formBuilder.group({
+          licenseNumber: ["", Validators.minLength(4)],
+          specialty: [""],
+          clinic: [""],
+          verificationDocument: [null],
+        }),
       },
       { validators: this.passwordMatchValidator },
     )
+  }
+
+  selectRole(role: string) {
+    this.registerForm.patchValue({ role })
   }
 
   get f() {
@@ -73,8 +90,8 @@ export class RegisterComponent {
           this.router.navigate(["/familiar/dashboard"])
         } else if (user.role === "cuidador") {
           this.router.navigate(["/cuidador/dashboard"])
-        } else if (user.role === "developer") {
-          this.router.navigate(["/developer/dashboard"])
+        } else if (user.role === "doctor") {
+          this.router.navigate(["/doctor/gestion-citas"])
         }
       },
       error: (error) => {

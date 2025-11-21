@@ -5,6 +5,7 @@ import { LayoutComponent } from '../layout/layout.component'
 import { PaymentsService } from '../../../core/services/payments.service'
 import { NotificationsService } from '../../../core/services/notifications.service'
 import { AuthService } from '../../../core/services/auth.service'
+import { StripeService } from '../../../core/services/stripe.service'
 import type { Payment } from '../../../core/models/payment.model'
 import type { User } from '../../../core/models/user.model'
 import { Subscription } from 'rxjs'
@@ -29,6 +30,7 @@ export class PaymentsComponent implements OnInit, OnDestroy {
     private paymentsService: PaymentsService,
     private notificationsService: NotificationsService,
     private authService: AuthService,
+    private stripeService: StripeService,
   ) {}
 
   ngOnInit(): void {
@@ -65,6 +67,32 @@ export class PaymentsComponent implements OnInit, OnDestroy {
     this.concept = ''
     this.amount = ''
     this.selectedFamiliaId = null
+  }
+
+  editPayment(payment: Payment) {
+    const newAmount = prompt('Nuevo importe', payment.amount) || payment.amount
+    this.paymentsService.updatePayment(payment.id, { amount: newAmount })
+  }
+
+  deletePayment(payment: Payment) {
+    if (!confirm('¿Eliminar pago?')) return
+    this.paymentsService.deletePayment(payment.id)
+    this.notificationsService.createNotification({
+      title: 'Pago eliminado',
+      description: `Solicitud ${payment.concept} eliminada.`,
+      type: 'info',
+      date: new Date().toLocaleString(),
+      sender: this.authService.getCurrentUser()?.name || 'Cuidador',
+      recipientId: payment.payerId,
+    })
+  }
+
+  payNow(payment: Payment) {
+    // call stripe mock service, then mark as paid with receipt
+    this.stripeService.createCheckoutSession(payment.amount, payment.concept).subscribe((res) => {
+      this.paymentsService.markAsPaid(payment.id, res.receiptUrl, payment.payer)
+      alert('Pago realizado. Recibo: ' + res.receiptUrl)
+    })
   }
 
   ngOnDestroy(): void {

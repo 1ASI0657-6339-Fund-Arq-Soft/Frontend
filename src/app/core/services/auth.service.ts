@@ -12,7 +12,7 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false)
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable()
 
-  private mockUsers = [
+  private mockUsers: Array<User & { password: string }> = [
     {
       id: "1",
       email: "familiar@test.com",
@@ -28,11 +28,11 @@ export class AuthService {
       role: "cuidador" as const,
     },
     {
-      id: "3",
-      email: "developer@test.com",
+      id: "4",
+      email: "doctor@test.com",
       password: "password123",
-      name: "Pedro Developer",
-      role: "developer" as const,
+      name: "Dr. Ana Médico",
+      role: "doctor" as const,
     },
   ]
 

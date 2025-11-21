@@ -2,7 +2,7 @@ export interface User {
   id: string
   email: string
   name: string
-  role: "familiar" | "cuidador" | "developer"
+  role: "familiar" | "cuidador" | "doctor"
 }
 
 export interface AuthResponse {
@@ -19,5 +19,5 @@ export interface RegisterRequest {
   email: string
   password: string
   name: string
-  role: "familiar" | "cuidador" | "developer"
+  role: "familiar" | "cuidador" | "doctor"
 }

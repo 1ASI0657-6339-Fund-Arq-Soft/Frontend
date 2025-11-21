@@ -31,6 +31,12 @@
           <div>{{ p.period }} • {{ p.createdAt | date:'short' }}</div>
           <div class="status">{{ p.status }}</div>
         </div>
+        <div class="request-actions">
+          <button class="btn" (click)="editPayment(p)">Modificar</button>
+          <button class="btn btn-danger" (click)="deletePayment(p)">Eliminar</button>
+          <button *ngIf="p.status !== 'paid'" class="btn btn-success" (click)="payNow(p)">Pagar (Simular)</button>
+          <a *ngIf="p.receiptUrl" [href]="p.receiptUrl" target="_blank" class="btn">Ver recibo</a>
+        </div>
       </div>
     </div>
   </div>

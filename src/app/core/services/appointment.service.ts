@@ -70,6 +70,19 @@ export class AppointmentService {
     throw new Error(`Cita con ID ${id} no encontrada`);
   }
 
+  patchAppointment(id: number, patch: Partial<Appointment>): Observable<Appointment> {
+    const index = this.appointments.findIndex(a => a.id === id);
+
+    if (index !== -1) {
+      const updated = { ...this.appointments[index], ...patch } as Appointment;
+      this.appointments[index] = updated;
+      this.appointmentsSubject.next([...this.appointments]);
+      return of(updated).pipe(delay(300));
+    }
+
+    throw new Error(`Cita con ID ${id} no encontrada`);
+  }
+
   deleteAppointment(id: number): Observable<void> {
     const index = this.appointments.findIndex(a => a.id === id);
 

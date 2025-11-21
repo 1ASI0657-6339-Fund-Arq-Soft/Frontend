@@ -23,9 +23,7 @@ export class DashboardComponent implements OnInit {
     { id: 3, name: "Juan Pérez", status: "Requiere atención", lastCheck: "11:00 AM" },
   ]
 
-  tasksTodo = 5
   patientsAssigned = 3
-  tasksCompleted = 12
 
   // form fields for creating notification
   notifTitle = ''
