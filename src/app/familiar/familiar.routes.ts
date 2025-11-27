@@ -26,11 +26,12 @@ export const FAMILIAR_ROUTES: Routes = [
       import("./components/resident-profile/resident-profile.component").then((m) => m.ResidentProfileComponent),
   },
   {
-    path: "pages",
-    loadComponent: () => import("./components/pages/pages.component").then((m) => m.PagesComponent),
-  },
-  {
     path: "settings",
     loadComponent: () => import("./components/settings/settings.component").then((m) => m.SettingsComponent),
   },
-]
+  {
+    path: 'payments',
+    loadComponent: () =>
+      import('./components/payments/payments.component').then(m => m.PaymentsComponent)
+  }
+];
