@@ -1,6 +1,12 @@
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from "@angular/forms";
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
 import { Router } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
 
@@ -12,16 +18,16 @@ import { AuthService } from "../../../core/services/auth.service";
   styleUrls: ["./register.component.css"],
 })
 export class RegisterComponent {
-  registerForm: FormGroup
-  loading = false
-  submitted = false
-  error = ""
+  registerForm: FormGroup;
+  loading = false;
+  submitted = false;
+  error = "";
 
   roles = [
     { value: "familiar", label: "Familiar" },
     { value: "cuidador", label: "Cuidador" },
     { value: "doctor", label: "Doctor" },
-  ]
+  ];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -35,73 +41,64 @@ export class RegisterComponent {
         password: ["", [Validators.required, Validators.minLength(6)]],
         confirmPassword: ["", Validators.required],
         role: ["familiar", Validators.required],
-        // optional nested resident data for `familiar` role
-        resident: this.formBuilder.group({
-          name: [""],
-          birthDate: [""],
-          medicalId: [""],
-        }),
-        // optional nested doctor verification data
-        doctor: this.formBuilder.group({
-          licenseNumber: ["", Validators.minLength(4)],
-          specialty: [""],
-          clinic: [""],
-          verificationDocument: [null],
-        }),
+
+        residentName: [""],
+        residentAge: [""],
+        residentCondition: [""],
       },
       { validators: this.passwordMatchValidator },
-    )
-  }
-
-  selectRole(role: string) {
-    this.registerForm.patchValue({ role })
+    );
   }
 
   get f() {
-    return this.registerForm.controls
+    return this.registerForm.controls;
   }
 
   passwordMatchValidator(group: FormGroup) {
-    const password = group.get("password")
-    const confirmPassword = group.get("confirmPassword")
+    const password = group.get("password");
+    const confirmPassword = group.get("confirmPassword");
 
     if (password && confirmPassword && password.value !== confirmPassword.value) {
-      confirmPassword.setErrors({ passwordMismatch: true })
-      return { passwordMismatch: true }
+      confirmPassword.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
     }
-    return null
+    return null;
+  }
+
+  isFamiliar(): boolean {
+    return this.registerForm.get("role")?.value === "familiar";
   }
 
   onSubmit(): void {
-    this.submitted = true
-    this.error = ""
+    this.submitted = true;
+    this.error = "";
 
-    if (this.registerForm.invalid) {
-      return
-    }
+    if (this.registerForm.invalid) return;
 
-    this.loading = true
-    const { confirmPassword, ...registerData } = this.registerForm.value
+    this.loading = true;
+
+    const { confirmPassword, ...registerData } = this.registerForm.value;
 
     this.authService.register(registerData).subscribe({
       next: (response) => {
-        const user = response.user
+        const user = response.user;
+
         if (user.role === "familiar") {
-          this.router.navigate(["/familiar/dashboard"])
+          this.router.navigate(["/familiar/dashboard"]);
         } else if (user.role === "cuidador") {
-          this.router.navigate(["/cuidador/dashboard"])
+          this.router.navigate(["/cuidador/dashboard"]);
         } else if (user.role === "doctor") {
-          this.router.navigate(["/doctor/gestion-citas"])
+          this.router.navigate(["/doctor/gestion-citas"]);
         }
       },
       error: (error) => {
-        this.error = error.message || "Error al registrarse"
-        this.loading = false
+        this.error = error.message || "Error al registrarse";
+        this.loading = false;
       },
-    })
+    });
   }
 
   goToLogin(): void {
-    this.router.navigate(["/login"])
+    this.router.navigate(["/login"]);
   }
 }

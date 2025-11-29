@@ -23,90 +23,61 @@
 
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
           <div class="form-group">
-            <label for="name">
-              <span class="icon">👤</span>
-              Usuario
-            </label>
+            <label for="name"><span class="icon">👤</span> Usuario</label>
             <input
               type="text"
               id="name"
-              formControlName="name"
-              placeholder="Ingrese su usuario"
               class="form-input"
+              placeholder="Ingrese su usuario"
+              formControlName="name"
               [class.is-invalid]="submitted && f['name'].errors"
             />
-            <div *ngIf="submitted && f['name'].errors" class="error-text">
-              <span *ngIf="f['name'].errors['required']">El nombre es requerido</span>
-              <span *ngIf="f['name'].errors['minlength']">Mínimo 3 caracteres</span>
-            </div>
           </div>
 
           <div class="form-group">
-            <label for="email">
-              <span class="icon">📧</span>
-              Correo
-            </label>
+            <label for="email"><span class="icon">📧</span> Correo</label>
             <input
               type="email"
               id="email"
-              formControlName="email"
-              placeholder="Ingrese su correo"
               class="form-input"
+              placeholder="Ingrese su correo"
+              formControlName="email"
               [class.is-invalid]="submitted && f['email'].errors"
             />
-            <div *ngIf="submitted && f['email'].errors" class="error-text">
-              <span *ngIf="f['email'].errors['required']">El email es requerido</span>
-              <span *ngIf="f['email'].errors['email']">Ingrese un email válido</span>
-            </div>
           </div>
 
           <div class="form-group">
-            <label for="password">
-              <span class="icon">🔒</span>
-              Contraseña
-            </label>
+            <label for="password"><span class="icon">🔒</span> Contraseña</label>
             <input
               type="password"
               id="password"
-              formControlName="password"
-              placeholder="Ingrese su contraseña"
               class="form-input"
+              placeholder="Ingrese su contraseña"
+              formControlName="password"
               [class.is-invalid]="submitted && f['password'].errors"
             />
-            <div *ngIf="submitted && f['password'].errors" class="error-text">
-              <span *ngIf="f['password'].errors['required']">La contraseña es requerida</span>
-              <span *ngIf="f['password'].errors['minlength']">Mínimo 6 caracteres</span>
-            </div>
           </div>
 
           <div class="form-group">
-            <label for="confirmPassword">
-              <span class="icon">🔒</span>
-              Confirma Contraseña
-            </label>
+            <label for="confirmPassword"
+            ><span class="icon">🔒</span> Confirmar Contraseña</label
+            >
             <input
               type="password"
               id="confirmPassword"
-              formControlName="confirmPassword"
-              placeholder="Ingrese su contraseña"
               class="form-input"
+              placeholder="Confirme su contraseña"
+              formControlName="confirmPassword"
               [class.is-invalid]="submitted && f['confirmPassword'].errors"
             />
-            <div *ngIf="submitted && f['confirmPassword'].errors" class="error-text">
-              <span *ngIf="f['confirmPassword'].errors['required']">Debe confirmar la contraseña</span>
-              <span *ngIf="f['confirmPassword'].errors['passwordMismatch']">Las contraseñas no coinciden</span>
-            </div>
           </div>
 
           <div class="form-group">
-            <label for="role">
-              <span class="icon">👥</span>
-              Tipo de Usuario
-            </label>
+            <label for="role"><span class="icon">👥</span> Tipo de Usuario</label>
             <select
               id="role"
-              formControlName="role"
               class="form-input"
+              formControlName="role"
               [class.is-invalid]="submitted && f['role'].errors"
             >
               <option value="" disabled>Seleccione su rol</option>
@@ -114,66 +85,42 @@
                 {{ role.label }}
               </option>
             </select>
-            <div *ngIf="submitted && f['role'].errors" class="error-text">
-              <span *ngIf="f['role'].errors['required']">Debe seleccionar un rol</span>
+          </div>
+
+          <div class="resident-section" *ngIf="isFamiliar()">
+            <h3 class="section-title">Datos del Residente</h3>
+
+            <div class="form-group">
+              <label>Nombre del residente</label>
+              <input
+                type="text"
+                class="form-input"
+                placeholder="Nombre completo"
+                formControlName="residentName"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Edad</label>
+              <input
+                type="number"
+                class="form-input"
+                placeholder="Edad del residente"
+                formControlName="residentAge"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Condición médica</label>
+              <textarea
+                class="form-input"
+                placeholder="Descripción breve de su condición"
+                formControlName="residentCondition"
+              ></textarea>
             </div>
           </div>
 
-          <!-- Familiar: register resident in the same flow -->
-          <div *ngIf="registerForm.get('role')?.value === 'familiar'" class="form-group resident-group">
-            <h3>Datos del Residente</h3>
-            <label for="residentName">Nombre Residente</label>
-            <input id="residentName" formControlName="resident" [ngModel]="" (ngModelChange)="null" class="form-input" placeholder="Nombre del residente" />
-            <small class="muted">(Se registrará al residente vinculado al familiar)</small>
-            <div class="grid">
-              <div>
-                <label for="birthDate">Fecha de Nacimiento</label>
-                <input id="birthDate" type="date" formControlName="resident" class="form-input" />
-              </div>
-              <div>
-                <label for="medicalId">ID Médico</label>
-                <input id="medicalId" formControlName="resident" class="form-input" placeholder="ID médico" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Doctor verification fields -->
-          <div *ngIf="registerForm.get('role')?.value === 'doctor'" class="form-group doctor-group">
-            <h3>Verificación Doctor</h3>
-            <div class="form-group">
-              <label for="licenseNumber">Número de Colegiatura</label>
-              <input id="licenseNumber" formControlName="doctor" class="form-input" placeholder="Número de colegiatura" />
-            </div>
-            <div class="form-group">
-              <label for="specialty">Especialidad</label>
-              <input id="specialty" formControlName="doctor" class="form-input" placeholder="Especialidad" />
-            </div>
-            <div class="form-group">
-              <label for="clinic">Centro / Clínica</label>
-              <input id="clinic" formControlName="doctor" class="form-input" placeholder="Institución" />
-            </div>
-            <div class="form-group">
-              <label for="verificationDocument">Documento (opcional)</label>
-              <input id="verificationDocument" type="file" (change)="null" class="form-input" />
-            </div>
-            <small class="muted">Se solicitará verificación administrativa después del registro.</small>
-          </div>
-
-          <!-- Quick role shortcuts like login -->
-          <div class="quick-role-select form-group">
-            <p class="muted">Registrar como:</p>
-            <div class="quick-buttons">
-              <button type="button" class="btn-quick btn-familiar" (click)="registerForm.patchValue({ role: 'familiar' })">Familiar</button>
-              <button type="button" class="btn-quick btn-cuidador" (click)="registerForm.patchValue({ role: 'cuidador' })">Cuidador</button>
-              <button type="button" class="btn-quick btn-doctor" (click)="registerForm.patchValue({ role: 'doctor' })">Doctor</button>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            class="btn btn-primary"
-            [disabled]="loading"
-          >
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
             <span *ngIf="!loading">Ingresar al Sistema</span>
             <span *ngIf="loading">Registrando...</span>
           </button>
@@ -181,7 +128,7 @@
 
         <div class="login-link">
           <p>¿Ya tiene cuenta?</p>
-          <button type="button" (click)="goToLogin()" class="link-button">
+          <button type="button" class="link-button" (click)="goToLogin()">
             Inicia sesión aquí
           </button>
         </div>
