@@ -4,6 +4,16 @@ h2 { color: #1f2937; font-size: 28px; margin-bottom: 16px; }
 
 .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
 
+.filter-section { margin-bottom: 16px; }
+.filter-section h3 { margin: 0 0 12px 0; font-size: 18px; color: #284088; }
+
+.filter-form { display: flex; align-items: center; gap: 16px; }
+.form-group { display: flex; flex-direction: column; }
+.form-group label { margin-bottom: 4px; font-size: 14px; color: #374151; }
+.form-group input { padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; }
+
+.form-actions { display: flex; gap: 8px; align-items: flex-end; }
+
 .meal-section { margin-bottom: 16px }
 .meal-section h3 { margin: 0 0 12px 0; font-size: 18px; color: #284088 }
 
@@ -16,7 +26,9 @@ h2 { color: #1f2937; font-size: 28px; margin-bottom: 16px; }
 /* Button styles similar to login */
 .btn { padding:10px 14px; border-radius:6px; border:none; cursor:pointer; font-weight:600 }
 .btn-primary { background:#2d4d8e; color:#fff }
+.btn-secondary { background: #e5e7eb; color: #374151; }
 
 @media (max-width: 768px) {
   .food-page { padding:16px }
+  .filter-form { flex-direction: column; align-items: stretch; }
 }

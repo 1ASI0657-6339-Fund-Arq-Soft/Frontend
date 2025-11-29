@@ -1,0 +1,17 @@
+<div class="doctor-gestion">
+  <h2>Gestión de Citas</h2>
+  <ul>
+    <li *ngFor="let a of (appointments$ | async)">
+      <div>
+        <strong>{{ a.title }}</strong>
+        <div>{{ a.start }} - {{ a.end }}</div>
+        <div>Status: {{ a.status || 'pendiente' }}</div>
+      </div>
+      <div class="actions">
+        <button (click)="accept(a.id)">Aceptar</button>
+        <button (click)="reject(a.id)">Rechazar</button>
+        <button (click)="view(a)">Ver detalles</button>
+      </div>
+    </li>
+  </ul>
+</div>

@@ -47,6 +47,7 @@
   border: 1px solid #eef2ff;
 }
 
+/* Styles for notification types */
 .notification-item.type-urgent {
   background: #fee2e2;
   border-color: #dc2626;
@@ -60,6 +61,21 @@
 .notification-item.type-warning {
   background: #fef3c7;
   border-color: #d97706;
+}
+
+/* Styles for notification states */
+.notification-item.unread {
+  background-color: #f0f4f8; /* Light background for unread */
+  border-left: 4px solid #3b82f6; /* Blue border for unread */
+}
+
+.notification-item.read {
+  opacity: 0.8; /* Slightly dim read notifications */
+}
+
+.notification-item.archived {
+  opacity: 0.5; /* Significantly dim archived notifications */
+  filter: grayscale(50%);
 }
 
 .notification-icon {
@@ -93,6 +109,12 @@
   background: #eef2ff;
   color: #284088;
   cursor: pointer;
+  white-space: nowrap; /* Prevent button text from wrapping */
+}
+
+.btn-action.btn-delete {
+  background-color: #fee2e2;
+  color: #dc2626;
 }
 
 .payments-table {
@@ -182,6 +204,36 @@
 .empty {
   color: #6b7280;
 }
+
+/* Notification filters styles */
+.notification-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.filter-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.filter-btn.active {
+  background-color: #2563eb; /* Blue for active filter */
+  color: white;
+  border-color: #2563eb;
+  font-weight: 600;
+}
+
 
 @media (max-width: 1024px) {
   .two-column {

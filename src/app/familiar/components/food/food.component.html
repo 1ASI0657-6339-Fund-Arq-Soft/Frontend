@@ -2,6 +2,24 @@
   <div class="food-page">
     <h2>Registro de Consumos</h2>
 
+    <div class="filter-section card">
+      <h3>Filtrar por Fecha</h3>
+      <form (ngSubmit)="applyFilter()" class="filter-form">
+        <div class="form-group">
+          <label for="startDate">Fecha de Inicio:</label>
+          <input type="date" id="startDate" name="startDate" [(ngModel)]="startDate" />
+        </div>
+        <div class="form-group">
+          <label for="endDate">Fecha de Fin:</label>
+          <input type="date" id="endDate" name="endDate" [(ngModel)]="endDate" />
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn">Filtrar</button>
+          <button type="button" (click)="clearFilter()" class="btn btn-secondary">Limpiar</button>
+        </div>
+      </form>
+    </div>
+
     <div class="meal-section card">
       <h3>Desayuno</h3>
       <div *ngFor="let e of grouped.breakfast" class="entry">

@@ -4,7 +4,7 @@ import { LayoutComponent } from "../layout/layout.component"
 import { NotificationsService } from "../../../core/services/notifications.service"
 import { AuthService } from "../../../core/services/auth.service"
 import type { Notification } from "../../../core/models/notification.model"
-import { Subscription } from "rxjs"
+import { BehaviorSubject, combineLatest, map, Observable, Subscription } from "rxjs"
 
 @Component({
   selector: "app-notifications",
@@ -21,32 +21,72 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     { period: "Dic, 2025", amount: "S/. 1,200.00", status: "Pagado", concept: "Cuidado Mensual + Servicios" },
   ]
 
+  currentFilter: BehaviorSubject<'all' | 'read' | 'unread' | 'archived'> = new BehaviorSubject<'all' | 'read' | 'unread' | 'archived'>('all')
+  filteredNotifications: Observable<Notification[]>
+
   private sub: Subscription | null = null
 
   constructor(private notificationsService: NotificationsService, private authService: AuthService) {
     console.log('[NotificationsComponent] constructor')
+
+    this.filteredNotifications = combineLatest([
+      this.notificationsService.notifications$,
+      this.currentFilter,
+      this.authService.currentUser$,
+    ]).pipe(
+      map(([notifications, filter, currentUser]) => {
+        if (!currentUser) {
+          return []
+        }
+        return notifications
+          .filter((n) => n.recipientId === currentUser.id)
+          .map((n) => ({
+            ...n,
+            status: n.status || (n.read ? 'read' : 'unread'), // Ensure status is set
+          }))
+          .filter((n) => {
+            if (filter === 'all') {
+              return n.status !== 'archived'
+            }
+            return n.status === filter
+          })
+      })
+    )
   }
 
   ngOnInit(): void {
-    console.log('[NotificationsComponent] ngOnInit - subscribing to notifications')
-    const currentUser = this.authService.getCurrentUser()
-    this.sub = this.notificationsService.notifications$.subscribe((items) => {
-      // show only notifications for this familiar
-      if (currentUser) {
-        this.notifications = items.filter((n) => n.recipientId === currentUser.id)
-      } else {
-        this.notifications = []
-      }
-      console.log('[NotificationsComponent] received notifications', this.notifications)
+    console.log('[NotificationsComponent] ngOnInit - subscribing to filtered notifications')
+    this.sub = this.filteredNotifications.subscribe((items: Notification[]) => {
+      this.notifications = items
+      console.log('[NotificationsComponent] received filtered notifications', this.notifications)
     })
   }
 
-  markAsRead(id: string) {
-    console.log('[NotificationsComponent] markAsRead', id)
-    this.notificationsService.markAsRead(id)
+  applyFilter(filter: 'all' | 'read' | 'unread' | 'archived'): void {
+    this.currentFilter.next(filter)
   }
 
-  clearAll() {
+  markAsRead(id: string): void {
+    console.log('[NotificationsComponent] markAsRead', id)
+    this.notificationsService.updateNotificationStatus(id, 'read')
+  }
+
+  markAsUnread(id: string): void {
+    console.log('[NotificationsComponent] markAsUnread', id)
+    this.notificationsService.updateNotificationStatus(id, 'unread')
+  }
+
+  archiveNotification(id: string): void {
+    console.log('[NotificationsComponent] archiveNotification', id)
+    this.notificationsService.updateNotificationStatus(id, 'archived')
+  }
+
+  deleteNotification(id: string): void {
+    console.log('[NotificationsComponent] deleteNotification', id)
+    this.notificationsService.deleteNotification(id)
+  }
+
+  clearAll(): void {
     console.log('[NotificationsComponent] clearAll')
     const currentUser = this.authService.getCurrentUser()
     if (!currentUser) return
@@ -55,5 +95,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe()
+    this.currentFilter.complete()
   }
 }

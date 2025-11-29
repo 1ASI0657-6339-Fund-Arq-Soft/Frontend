@@ -15,11 +15,11 @@ export class NotificationsService {
     return this.notificationsSubject.value
   }
 
-  createNotification(payload: Omit<Notification, 'id' | 'createdAt' | 'read'>): Notification {
+  createNotification(payload: Omit<Notification, 'id' | 'createdAt' | 'read' | 'status'>): Notification {
     const notif: Notification = {
       id: this.generateId(),
       ...payload,
-      read: false,
+      status: 'unread', // Default status for new notifications
       createdAt: new Date().toISOString(),
     }
     const current = [notif, ...this.notificationsSubject.value]
@@ -28,14 +28,32 @@ export class NotificationsService {
     return notif
   }
 
-  markAsRead(notificationId: string): void {
-    const updated = this.notificationsSubject.value.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
+  updateNotificationStatus(notificationId: string, newStatus: 'read' | 'unread' | 'archived'): void {
+    const updated = this.notificationsSubject.value.map((n) =>
+      n.id === notificationId
+        ? { ...n, status: newStatus, read: newStatus === 'read' }
+        : n,
+    )
     this.notificationsSubject.next(updated)
     this.saveToStorage(updated)
   }
 
+  deleteNotification(notificationId: string): void {
+    const remaining = this.notificationsSubject.value.filter(
+      (n) => n.id !== notificationId,
+    )
+    this.notificationsSubject.next(remaining)
+    this.saveToStorage(remaining)
+  }
+
+  markAsRead(notificationId: string): void {
+    this.updateNotificationStatus(notificationId, 'read')
+  }
+
   removeForRecipient(recipientId: string): void {
-    const remaining = this.notificationsSubject.value.filter((n) => n.recipientId !== recipientId)
+    const remaining = this.notificationsSubject.value.filter(
+      (n) => n.recipientId !== recipientId,
+    )
     this.notificationsSubject.next(remaining)
     this.saveToStorage(remaining)
   }
@@ -46,7 +64,7 @@ export class NotificationsService {
   }
 
   getUnreadCount(): number {
-    return this.notificationsSubject.value.filter((n) => !n.read).length
+    return this.notificationsSubject.value.filter((n) => n.status === 'unread').length
   }
 
   private saveToStorage(items: Notification[]) {
@@ -62,7 +80,12 @@ export class NotificationsService {
       const raw = localStorage.getItem('notifications')
       if (raw) {
         const parsed = JSON.parse(raw) as Notification[]
-        this.notificationsSubject.next(parsed)
+        // Ensure all loaded notifications have a 'status' property
+        const withStatus = parsed.map(n => ({
+          ...n,
+          status: n.status || (n.read ? 'read' : 'unread') // Derive status from 'read' if not present
+        }));
+        this.notificationsSubject.next(withStatus)
       } else {
         // seed with example notifications to aid development / testing
         const seed: Notification[] = [
@@ -72,7 +95,7 @@ export class NotificationsService {
             description: 'Tiene una cita programada para el 20 de Noviembre',
             type: 'info',
             date: new Date().toLocaleString(),
-            read: false,
+            status: 'unread',
             createdAt: new Date().toISOString(),
             sender: 'Sistema',
           },
@@ -82,7 +105,7 @@ export class NotificationsService {
             description: 'Recordatorio: administrar medicamento a las 18:00',
             type: 'urgent',
             date: new Date().toLocaleString(),
-            read: false,
+            status: 'unread',
             createdAt: new Date().toISOString(),
             sender: 'Cuidador',
           },

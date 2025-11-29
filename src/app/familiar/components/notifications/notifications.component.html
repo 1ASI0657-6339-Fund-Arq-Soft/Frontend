@@ -10,21 +10,32 @@
         </div>
       </div>
 
-      <div class="notifications-list">
-        <div *ngFor="let notif of notifications" class="card notification-item" [class.read]="notif.read">
-          <div class="notification-content">
-            <h4>{{ notif.title }} <small *ngIf="notif.read">(leído)</small></h4>
-            <p>{{ notif.description }}</p>
-            <div class="meta">{{ notif.date }} • De: {{ notif.sender || 'Sistema' }}</div>
-          </div>
-          <div class="notification-actions">
-            <button class="btn-action" (click)="markAsRead(notif.id)">Marcar leído</button>
-          </div>
-        </div>
+      <div class="notification-filters">
+        <button class="btn filter-btn" [class.active]="(currentFilter | async) === 'all'" (click)="applyFilter('all')">Todos</button>
+        <button class="btn filter-btn" [class.active]="(currentFilter | async) === 'unread'" (click)="applyFilter('unread')">No Leídos</button>
+        <button class="btn filter-btn" [class.active]="(currentFilter | async) === 'read'" (click)="applyFilter('read')">Leídos</button>
+        <button class="btn filter-btn" [class.active]="(currentFilter | async) === 'archived'" (click)="applyFilter('archived')">Archivados</button>
+      </div>
 
-        <div *ngIf="notifications.length === 0" class="empty">No hay notificaciones</div>
+      <div class="notifications-list">
+        <div *ngIf="(filteredNotifications | async) as notifs">
+          <div *ngFor="let notif of notifs" class="card notification-item" [class.read]="notif.status === 'read'" [class.unread]="notif.status === 'unread'">
+            <div class="notification-content">
+              <h4>{{ notif.title }} <small *ngIf="notif.status === 'read'">(leído)</small><small *ngIf="notif.status === 'archived'">(archivado)</small></h4>
+              <p>{{ notif.description }}</p>
+              <div class="meta">{{ notif.date }} • De: {{ notif.sender || 'Sistema' }}</div>
+            </div>
+            <div class="notification-actions">
+              <button *ngIf="notif.status === 'unread'" class="btn-action" (click)="markAsRead(notif.id)">Marcar leído</button>
+              <button *ngIf="notif.status === 'read'" class="btn-action" (click)="markAsUnread(notif.id)">Marcar no leído</button>
+              <button *ngIf="notif.status !== 'archived'" class="btn-action" (click)="archiveNotification(notif.id)">Archivar</button>
+              <button class="btn-action btn-delete" (click)="deleteNotification(notif.id)">Eliminar</button>
+            </div>
+          </div>
+
+          <div *ngIf="notifs.length === 0" class="empty">No hay notificaciones para este filtro.</div>
+        </div>
       </div>
     </div>
-
   </div>
 </app-familiar-layout>
