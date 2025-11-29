@@ -1,53 +1,102 @@
-import { Component, type OnInit } from "@angular/core"
-import { CommonModule } from "@angular/common"
-import { LayoutComponent } from "../layout/layout.component"
-import { AuthService } from "../../../core/services/auth.service"
-import { User } from "../../../core/models/user.model"
-import { Router } from "@angular/router"
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { LayoutComponent } from '../layout/layout.component';
+import { ResidentDataService, PerfilCompleto } from '../../services/resident-data.service';
+import { Subscription } from 'rxjs';
 
 @Component({
-  selector: "app-familiar-dashboard",
+  selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, LayoutComponent],
-  templateUrl: "./dashboard.component.html",
-  styleUrls: ["./dashboard.component.css"],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit {
-  currentUser: User | null = null
-  upcomingAppointments = [
-    { id: 1, title: "Consulta Médica", date: "2025-01-15", time: "10:00 AM", doctor: "Dr. Juan Pérez" },
-    { id: 2, title: "Terapia Física", date: "2025-01-18", time: "2:00 PM", doctor: "Lic. María González" },
-  ]
+export class DashboardComponent implements OnInit, OnDestroy {
+  perfilActual: PerfilCompleto | null = null;
 
-  recentNotifications = [
-    { id: 1, title: "Medicamento Tomado", message: "Se administró medicamento a las 8:30 AM", type: "success" },
+  proximasCitas = [
     {
-      id: 2,
-      title: "Recordatorio Importante",
-      message: "No olvidar la cita de mañana a las 10:00 AM",
-      type: "warning",
+      fecha: '01-15',
+      tipo: 'Consulta Médica',
+      profesional: 'Dr. Juan Pérez',
+      hora: '10:00 AM'
     },
-  ]
+    {
+      fecha: '01-18',
+      tipo: 'Terapia Física',
+      profesional: 'Lic. María González',
+      hora: '2:00 PM'
+    }
+  ];
 
-  residentInfo = {
-    name: "Carlos García López",
-    age: 78,
-    healthStatus: "Estable",
-    lastCheckup: "2025-01-10",
-    conditions: ["Hipertensión", "Diabetes Tipo 2"],
-  }
+  estadisticas = {
+    proximasCitas: 3,
+    notificaciones: 7,
+    paginasPendientes: 1
+  };
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-  ) {}
+  private subscription = new Subscription();
+
+  constructor(private residentDataService: ResidentDataService) {}
 
   ngOnInit(): void {
-    this.currentUser = this.authService.getCurrentUser()
+    this.subscription.add(
+      this.residentDataService.perfilActual$.subscribe(perfil => {
+        this.perfilActual = perfil;
+
+        if (!perfil) {
+          const perfiles = this.residentDataService.obtenerTodosPerfiles();
+          if (perfiles.length > 0) {
+            this.residentDataService.establecerPerfilActual(perfiles[0].residente.id!);
+          }
+        }
+      })
+    );
   }
 
-  logout(): void {
-    this.authService.logout()
-    this.router.navigate(["/login"])
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
+  get nombreResidente(): string {
+    return this.perfilActual?.residente.nombre || 'Residente';
+  }
+
+  get edadResidente(): number {
+    return this.perfilActual?.residente.edad || 0;
+  }
+
+  get estadoGeneral(): string {
+    return this.perfilActual?.residente.estadoGeneral || 'Estable';
+  }
+
+  get ultimoChequeo(): string {
+    if (!this.perfilActual?.residente.ultimoChequeo) {
+      return new Date().toISOString().split('T')[0];
+    }
+    return this.perfilActual.residente.ultimoChequeo;
+  }
+
+  get condiciones(): string {
+    return this.perfilActual?.residente.condiciones || 'Sin condiciones registradas';
+  }
+
+  getEstadoClass(): string {
+    const estado = this.estadoGeneral;
+    if (estado === 'Estable') return 'estado-estable';
+    if (estado === 'Requiere Atención') return 'estado-atencion';
+    if (estado === 'Crítico') return 'estado-critico';
+    if (estado === 'En Recuperación') return 'estado-recuperacion';
+    return 'estado-estable';
+  }
+
+  formatearFecha(fecha: string): string {
+    if (!fecha) return 'No registrado';
+    const date = new Date(fecha);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   }
 }

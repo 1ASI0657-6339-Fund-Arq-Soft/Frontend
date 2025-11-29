@@ -9,6 +9,7 @@ import {
 } from "@angular/forms";
 import { Router } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
+import { ResidentDataService } from "../../../familiar/services/resident-data.service";
 
 @Component({
   selector: "app-register",
@@ -32,6 +33,7 @@ export class RegisterComponent {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
+    private residentDataService: ResidentDataService,
     private router: Router,
   ) {
     this.registerForm = this.formBuilder.group(
@@ -44,10 +46,26 @@ export class RegisterComponent {
 
         residentName: [""],
         residentAge: [""],
+        residentBirthDate: [""],
         residentCondition: [""],
+
+        phone: [""],
+        relationship: [""],
       },
       { validators: this.passwordMatchValidator },
     );
+
+    this.registerForm.get('role')?.valueChanges.subscribe(role => {
+      if (role === 'familiar') {
+        this.registerForm.get('residentName')?.setValidators([Validators.required]);
+        this.registerForm.get('residentAge')?.setValidators([Validators.required, Validators.min(0)]);
+      } else {
+        this.registerForm.get('residentName')?.clearValidators();
+        this.registerForm.get('residentAge')?.clearValidators();
+      }
+      this.registerForm.get('residentName')?.updateValueAndValidity();
+      this.registerForm.get('residentAge')?.updateValueAndValidity();
+    });
   }
 
   get f() {
@@ -73,7 +91,12 @@ export class RegisterComponent {
     this.submitted = true;
     this.error = "";
 
-    if (this.registerForm.invalid) return;
+    if (this.registerForm.invalid) {
+      Object.keys(this.registerForm.controls).forEach(key => {
+        this.registerForm.get(key)?.markAsTouched();
+      });
+      return;
+    }
 
     this.loading = true;
 
@@ -84,12 +107,34 @@ export class RegisterComponent {
         const user = response.user;
 
         if (user.role === "familiar") {
+          const datosRegistro = {
+            usuario: registerData.name,
+            correo: registerData.email,
+            tipoUsuario: 'Familiar',
+            telefono: registerData.phone || '',
+            relacion: registerData.relationship || 'Familiar',
+
+            nombreResidente: registerData.residentName,
+            edadResidente: registerData.residentAge,
+            fechaNacimiento: registerData.residentBirthDate || '',
+            condiciones: registerData.residentCondition || ''
+          };
+
+          const residenteId = this.residentDataService.crearPerfilDesdeRegistro(datosRegistro);
+          this.residentDataService.establecerPerfilActual(residenteId);
+
+          console.log('Perfil del residente creado con ID:', residenteId);
+        }
+
+        if (user.role === "familiar") {
           this.router.navigate(["/familiar/dashboard"]);
         } else if (user.role === "cuidador") {
           this.router.navigate(["/cuidador/dashboard"]);
         } else if (user.role === "doctor") {
           this.router.navigate(["/doctor/gestion-citas"]);
         }
+
+        this.loading = false;
       },
       error: (error) => {
         this.error = error.message || "Error al registrarse";

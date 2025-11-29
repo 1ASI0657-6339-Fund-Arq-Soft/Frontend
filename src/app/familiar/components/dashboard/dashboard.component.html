@@ -1,53 +1,122 @@
 <app-familiar-layout>
-  <div class="dashboard">
-    <h2>Dashboard</h2>
+  <div class="dashboard-container">
 
-    <div class="dashboard-grid">
-      <div class="card stats-card">
-        <div class="stat-item">
-          <div class="stat-value">3</div>
-          <div class="stat-label">Próximas citas</div>
+    <header class="dashboard-header">
+      <h1>Dashboard Familiar</h1>
+      <p class="subtitle">Resumen general y estado del residente</p>
+    </header>
+
+    <section class="stats-grid">
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-primary">
+          <i class="icon-calendar"></i>
         </div>
-        <div class="stat-item">
-          <div class="stat-value">7</div>
-          <div class="stat-label">Notificaciones</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">1</div>
-          <div class="stat-label">Páginas Pendientes</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">Estable</div>
-          <div class="stat-label">Estado general</div>
+        <div class="stat-content">
+          <h3>{{ estadisticas.proximasCitas }}</h3>
+          <p>Próximas citas</p>
         </div>
       </div>
 
-      <!-- 'Actividad Reciente' section removed as requested -->
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-warning">
+          <i class="icon-bell"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ estadisticas.notificaciones }}</h3>
+          <p>Notificaciones</p>
+        </div>
+      </div>
 
-      <div class="card">
-        <h3>Próximas Citas</h3>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-danger">
+          <i class="icon-file-alert"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ estadisticas.paginasPendientes }}</h3>
+          <p>Páginas pendientes</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-success">
+          <i class="icon-heart"></i>
+        </div>
+        <div class="stat-content">
+          <h3 [ngClass]="getEstadoClass()">{{ estadoGeneral }}</h3>
+          <p>Estado general</p>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="main-grid">
+
+      <article class="content-card">
+        <div class="card-header">
+          <h2>Próximas Citas</h2>
+          <i class="icon-calendar"></i>
+        </div>
+
         <div class="appointments-list">
-          <div class="appointment-item" *ngFor="let apt of upcomingAppointments">
-            <div class="appointment-date">{{ apt.date | slice:5:10 }}</div>
-            <div class="appointment-details">
-              <p class="appointment-title">{{ apt.title }}</p>
-              <p class="appointment-doctor">{{ apt.doctor }}</p>
+          <div class="appointment-item" *ngFor="let cita of proximasCitas">
+            <div class="appointment-date">
+              <span class="date-day">{{ cita.fecha.split('-')[1] }}</span>
+              <span class="date-month">{{ cita.fecha.split('-')[0] }}</span>
             </div>
-            <div class="appointment-time">{{ apt.time }}</div>
+            <div class="appointment-details">
+              <h4>{{ cita.tipo }}</h4>
+              <p>{{ cita.profesional }}</p>
+              <span class="appointment-time">{{ cita.hora }}</span>
+            </div>
           </div>
         </div>
-      </div>
+      </article>
 
-      <div class="card">
-        <h3>Información del Residente</h3>
-        <div class="resident-info">
-          <p><strong>Nombre:</strong> {{ residentInfo.name }}</p>
-          <p><strong>Edad:</strong> {{ residentInfo.age }} años</p>
-          <p><strong>Estado:</strong> {{ residentInfo.healthStatus }}</p>
-          <p><strong>Último Chequeo:</strong> {{ residentInfo.lastCheckup }}</p>
-          <p><strong>Condiciones:</strong> {{ residentInfo.conditions.join(', ') }}</p>
+      <article class="content-card" *ngIf="perfilActual">
+        <div class="card-header">
+          <h2>Información del Residente</h2>
+          <i class="icon-user"></i>
         </div>
-      </div>
-    </div>
+
+        <div class="resident-info">
+          <div class="info-item">
+            <span class="info-label">Nombre:</span>
+            <span class="info-value">{{ nombreResidente }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Edad:</span>
+            <span class="info-value">{{ edadResidente }} años</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Estado:</span>
+            <span class="info-value" [ngClass]="getEstadoClass()">
+              {{ estadoGeneral }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Último Chequeo:</span>
+            <span class="info-value">{{ formatearFecha(ultimoChequeo) }}</span>
+          </div>
+
+          <div class="info-item full-width">
+            <span class="info-label">Condiciones:</span>
+            <span class="info-value">{{ condiciones }}</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="content-card no-data-card" *ngIf="!perfilActual">
+        <div class="no-data-content">
+          <i class="icon-info"></i>
+          <h3>No hay información del residente</h3>
+          <p>Complete el registro para visualizar los datos aquí.</p>
+        </div>
+      </article>
+
+    </section>
   </div>
 </app-familiar-layout>

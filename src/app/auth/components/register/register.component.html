@@ -1,137 +1,229 @@
 <div class="register-container">
-  <div class="register-wrapper">
-    <div class="register-brand">
-      <div class="brand-content">
-        <h1>AgeCare</h1>
-        <p>Sistema integral de gestión y cuidado para adultos mayores</p>
-        <ul class="brand-features">
-          <li>Seguro y confiable</li>
-          <li>Monitoreo 24/7</li>
-          <li>Comunicación familiar</li>
-        </ul>
+  <div class="register-left">
+    <div class="brand-section">
+      <h1 class="brand-title">AgeCare</h1>
+      <p class="brand-subtitle">Sistema integral de gestión y cuidado para adultos mayores</p>
+
+      <div class="features-list">
+        <div class="feature-item">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <span>Seguro y confiable</span>
+        </div>
+        <div class="feature-item">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <span>Monitoreo 24/7</span>
+        </div>
+        <div class="feature-item">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-2M3 6a2 2 0 012-2h10a2 2 0 012 2v6a2 2 0 01-2 2H9l-4 4V6z" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <span>Comunicación familiar</span>
+        </div>
       </div>
     </div>
+  </div>
 
-    <div class="register-form-wrapper">
-      <div class="form-container">
-        <h2>Registrate</h2>
-        <p class="form-subtitle">Acceso a la plataforma de gestión</p>
+  <div class="register-right">
+    <div class="register-card">
+      <h2 class="register-title">Regístrate</h2>
+      <p class="register-subtitle">Acceso a la plataforma de gestión</p>
 
-        <div *ngIf="error" class="alert alert-error">
-          {{ error }}
-        </div>
+      <div class="alert-error" *ngIf="error">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm1 15H9v-2h2v2zm0-4H9V5h2v6z" fill="currentColor"/>
+        </svg>
+        <span>{{ error }}</span>
+      </div>
 
-        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="form-section">
+          <h3 class="section-title">Información de la cuenta</h3>
+
           <div class="form-group">
-            <label for="name"><span class="icon">👤</span> Usuario</label>
+            <label>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Nombre Completo
+            </label>
             <input
               type="text"
-              id="name"
-              class="form-input"
-              placeholder="Ingrese su usuario"
               formControlName="name"
-              [class.is-invalid]="submitted && f['name'].errors"
+              placeholder="Ingrese su nombre completo"
+              [class.error]="submitted && f['name'].errors"
             />
+            <div class="error-message" *ngIf="submitted && f['name'].errors">
+              <span *ngIf="f['name'].errors['required']">El nombre es requerido</span>
+              <span *ngIf="f['name'].errors['minlength']">El nombre debe tener al menos 3 caracteres</span>
+            </div>
           </div>
 
           <div class="form-group">
-            <label for="email"><span class="icon">📧</span> Correo</label>
+            <label>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Correo Electrónico
+            </label>
             <input
               type="email"
-              id="email"
-              class="form-input"
-              placeholder="Ingrese su correo"
               formControlName="email"
-              [class.is-invalid]="submitted && f['email'].errors"
+              placeholder="correo@ejemplo.com"
+              [class.error]="submitted && f['email'].errors"
             />
+            <div class="error-message" *ngIf="submitted && f['email'].errors">
+              <span *ngIf="f['email'].errors['required']">El correo es requerido</span>
+              <span *ngIf="f['email'].errors['email']">Ingrese un correo válido</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Contraseña
+              </label>
+              <input
+                type="password"
+                formControlName="password"
+                placeholder="••••••••"
+                [class.error]="submitted && f['password'].errors"
+              />
+              <div class="error-message" *ngIf="submitted && f['password'].errors">
+                <span *ngIf="f['password'].errors['required']">La contraseña es requerida</span>
+                <span *ngIf="f['password'].errors['minlength']">Mínimo 6 caracteres</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Confirmar Contraseña
+              </label>
+              <input
+                type="password"
+                formControlName="confirmPassword"
+                placeholder="••••••••"
+                [class.error]="submitted && f['confirmPassword'].errors"
+              />
+              <div class="error-message" *ngIf="submitted && f['confirmPassword'].errors">
+                <span *ngIf="f['confirmPassword'].errors['required']">Confirme la contraseña</span>
+                <span *ngIf="f['confirmPassword'].errors['passwordMismatch']">Las contraseñas no coinciden</span>
+              </div>
+            </div>
           </div>
 
           <div class="form-group">
-            <label for="password"><span class="icon">🔒</span> Contraseña</label>
-            <input
-              type="password"
-              id="password"
-              class="form-input"
-              placeholder="Ingrese su contraseña"
-              formControlName="password"
-              [class.is-invalid]="submitted && f['password'].errors"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="confirmPassword"
-            ><span class="icon">🔒</span> Confirmar Contraseña</label
-            >
-            <input
-              type="password"
-              id="confirmPassword"
-              class="form-input"
-              placeholder="Confirme su contraseña"
-              formControlName="confirmPassword"
-              [class.is-invalid]="submitted && f['confirmPassword'].errors"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="role"><span class="icon">👥</span> Tipo de Usuario</label>
-            <select
-              id="role"
-              class="form-input"
-              formControlName="role"
-              [class.is-invalid]="submitted && f['role'].errors"
-            >
-              <option value="" disabled>Seleccione su rol</option>
+            <label>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Tipo de Usuario
+            </label>
+            <select formControlName="role">
               <option *ngFor="let role of roles" [value]="role.value">
                 {{ role.label }}
               </option>
             </select>
           </div>
+        </div>
 
-          <div class="resident-section" *ngIf="isFamiliar()">
-            <h3 class="section-title">Datos del Residente</h3>
+        <div class="form-section" *ngIf="isFamiliar()">
+          <h3 class="section-title">Información del Residente</h3>
 
-            <div class="form-group">
-              <label>Nombre del residente</label>
-              <input
-                type="text"
-                class="form-input"
-                placeholder="Nombre completo"
-                formControlName="residentName"
-              />
+          <div class="form-group">
+            <label>Nombre del Residente</label>
+            <input
+              type="text"
+              formControlName="residentName"
+              placeholder="Nombre completo del residente"
+              [class.error]="submitted && f['residentName'].errors"
+            />
+            <div class="error-message" *ngIf="submitted && f['residentName'].errors">
+              <span *ngIf="f['residentName'].errors['required']">El nombre del residente es requerido</span>
             </div>
+          </div>
 
+          <div class="form-row">
             <div class="form-group">
               <label>Edad</label>
               <input
                 type="number"
-                class="form-input"
-                placeholder="Edad del residente"
                 formControlName="residentAge"
+                placeholder="Edad"
+                [class.error]="submitted && f['residentAge'].errors"
+              />
+              <div class="error-message" *ngIf="submitted && f['residentAge'].errors">
+                <span *ngIf="f['residentAge'].errors['required']">La edad es requerida</span>
+                <span *ngIf="f['residentAge'].errors['min']">Ingrese una edad válida</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Fecha de Nacimiento</label>
+              <input
+                type="date"
+                formControlName="residentBirthDate"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Condiciones Médicas</label>
+            <textarea
+              formControlName="residentCondition"
+              placeholder="Ej: Hipertensión, Diabetes Tipo 2, etc."
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Teléfono de Contacto</label>
+              <input
+                type="tel"
+                formControlName="phone"
+                placeholder="+51 999 999 999"
               />
             </div>
 
             <div class="form-group">
-              <label>Condición médica</label>
-              <textarea
-                class="form-input"
-                placeholder="Descripción breve de su condición"
-                formControlName="residentCondition"
-              ></textarea>
+              <label>Relación con el Residente</label>
+              <input
+                type="text"
+                formControlName="relationship"
+                placeholder="Ej: Hijo/a, Esposo/a"
+              />
             </div>
           </div>
-
-          <button type="submit" class="btn btn-primary" [disabled]="loading">
-            <span *ngIf="!loading">Ingresar al Sistema</span>
-            <span *ngIf="loading">Registrando...</span>
-          </button>
-        </form>
-
-        <div class="login-link">
-          <p>¿Ya tiene cuenta?</p>
-          <button type="button" class="link-button" (click)="goToLogin()">
-            Inicia sesión aquí
-          </button>
         </div>
+
+        <button
+          type="submit"
+          class="btn-register"
+          [disabled]="loading"
+          [class.loading]="loading"
+        >
+          <span *ngIf="!loading">Registrarse</span>
+          <span *ngIf="loading" class="loading-spinner">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Registrando...
+          </span>
+        </button>
+      </form>
+
+      <div class="register-footer">
+        <p>¿Ya tienes una cuenta? <a (click)="goToLogin()">Inicia sesión</a></p>
       </div>
     </div>
   </div>
