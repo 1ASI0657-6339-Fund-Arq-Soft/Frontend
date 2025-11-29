@@ -1,0 +1,38 @@
+<div class="doctor-layout">
+  <nav class="navbar navbar-doctor">
+    <div class="navbar-left">
+      <button class="hamburger" (click)="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <h1 class="navbar-brand">AgeCare</h1>
+    </div>
+
+    <div class="navbar-right">
+      <span class="user-name">{{ currentUser.name }}</span>
+      <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <div class="layout-wrapper">
+    <aside class="sidebar" [class.open]="sidebarOpen">
+      <ul class="menu">
+        <li>
+          <a
+            routerLink="/doctor/gestion-citas"
+            routerLinkActive="active"
+            class="menu-item"
+          >
+            <span class="label">Gestión de Citas</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <ng-content></ng-content>
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

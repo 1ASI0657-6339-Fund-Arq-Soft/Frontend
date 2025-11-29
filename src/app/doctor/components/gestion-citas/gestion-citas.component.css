@@ -1,0 +1,151 @@
+.doctor-gestion {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: "Inter", sans-serif;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #1f2937;
+  text-align: center;
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.appointment-card {
+  background: #ffffff;
+  padding: 18px 20px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 5px solid #d1d5db;
+  transition: 0.2s ease-in-out;
+}
+
+.appointment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.appointment-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 4px 0;
+}
+
+.appointment-time {
+  font-size: 14px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.separator {
+  font-weight: bold;
+}
+
+.status {
+  margin-top: 8px;
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+.status.pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status.accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.appointment-card.accepted {
+  border-left-color: #22c55e;
+}
+
+.appointment-card.rejected {
+  border-left-color: #ef4444;
+}
+
+.appointment-card.pending,
+.appointment-card.undefined {
+  border-left-color: #f59e0b;
+}
+
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.15s;
+  font-weight: 600;
+}
+
+.accept {
+  background: #22c55e;
+  color: white;
+}
+
+.accept:hover {
+  background: #16a34a;
+}
+
+.reject {
+  background: #ef4444;
+  color: white;
+}
+
+.reject:hover {
+  background: #dc2626;
+}
+
+.details {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.details:hover {
+  background: #d1d5db;
+}
+
+@media (max-width: 650px) {
+  .appointment-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .card-actions {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
