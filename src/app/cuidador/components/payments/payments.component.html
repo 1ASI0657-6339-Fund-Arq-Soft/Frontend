@@ -1,43 +1,74 @@
 <app-cuidador-layout>
   <div class="payments-dashboard">
-    <h2>Solicitudes de Pago</h2>
 
-    <div class="create-form card">
-      <label>Destinatario</label>
-      <select [(ngModel)]="selectedFamiliaId">
-        <option [value]="null">Seleccione un familiar</option>
-        <option *ngFor="let f of familiares" [value]="f.id">{{ f.name }}</option>
-      </select>
+    <h2 class="title">Gestión de Pagos</h2>
 
-      <label>Periodo</label>
-      <input type="text" [(ngModel)]="period" />
+    <div class="card create-form">
+      <h3 class="section-title">Crear nueva solicitud</h3>
 
-      <label>Concepto</label>
-      <input type="text" [(ngModel)]="concept" />
+      <div class="form-group">
+        <label>Destinatario</label>
+        <select [(ngModel)]="selectedFamiliaId">
+          <option value="">Seleccione un familiar</option>
+          <option *ngFor="let f of familiares" [value]="f.id">{{ f.name }}</option>
+        </select>
+      </div>
 
-      <label>Monto</label>
-      <input type="text" [(ngModel)]="amount" />
+      <div class="form-row">
+        <div class="form-group">
+          <label>Periodo</label>
+          <input type="text" [(ngModel)]="period" placeholder="Ejem: Enero 2025" />
+        </div>
 
-      <button class="btn" (click)="createRequest()">Crear Solicitud</button>
+        <div class="form-group">
+          <label>Monto</label>
+          <input type="number" [(ngModel)]="amount" placeholder="S/ 0.00" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Concepto</label>
+        <input type="text" [(ngModel)]="concept" placeholder="Cuidado semanal, etc." />
+      </div>
+
+      <button class="btn btn-primary" (click)="createRequest()">Crear Solicitud</button>
     </div>
 
     <div class="requests-list">
+      <h3 class="section-title">Solicitudes registradas</h3>
+
+      <div *ngIf="payments.length === 0" class="empty">
+        No hay solicitudes creadas.
+      </div>
+
       <div *ngFor="let p of payments" class="card request-item">
-        <div class="request-main">
-          <div class="request-title">{{ p.concept }}</div>
-          <div class="request-amount">{{ p.amount }}</div>
+        <div class="request-header">
+          <div class="request-info">
+            <span class="request-title">{{ p.concept }}</span>
+            <span class="request-amount">S/ {{ p.amount }}</span>
+          </div>
+          <span class="status" [ngClass]="p.status">{{ p.status }}</span>
         </div>
+
         <div class="request-meta">
-          <div>{{ p.period }} • {{ p.createdAt | date:'short' }}</div>
-          <div class="status">{{ p.status }}</div>
+          <span class="tag">{{ p.period }}</span>
+          <span class="date">{{ p.createdAt | date:'short' }}</span>
         </div>
+
         <div class="request-actions">
-          <button class="btn" (click)="editPayment(p)">Modificar</button>
+          <button class="btn btn-light" (click)="editPayment(p)">Editar</button>
           <button class="btn btn-danger" (click)="deletePayment(p)">Eliminar</button>
-          <button *ngIf="p.status !== 'paid'" class="btn btn-success" (click)="payNow(p)">Pagar (Simular)</button>
-          <a *ngIf="p.receiptUrl" [href]="p.receiptUrl" target="_blank" class="btn">Ver recibo</a>
+
+          <button *ngIf="p.status !== 'paid'" class="btn btn-success" (click)="payNow(p)">
+            Simular Pago
+          </button>
+
+          <a *ngIf="p.receiptUrl" class="btn btn-primary" [href]="p.receiptUrl" target="_blank">
+            Ver Recibo
+          </a>
         </div>
       </div>
     </div>
+
   </div>
 </app-cuidador-layout>

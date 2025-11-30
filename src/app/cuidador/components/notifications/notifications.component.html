@@ -1,8 +1,10 @@
 <app-cuidador-layout>
   <div class="notifications-admin">
-    <h2>Notificaciones</h2>
+    <h2 class="title">Gestión de Notificaciones</h2>
 
-    <div class="create-form card">
+    <div class="card create-form">
+      <h3 class="section-title">Crear nueva notificación</h3>
+
       <label>Destinatario</label>
       <select [(ngModel)]="recipientId">
         <option [value]="null">Seleccione un familiar</option>
@@ -10,32 +12,39 @@
       </select>
 
       <label>Título</label>
-      <input type="text" [(ngModel)]="title" />
+      <input type="text" [(ngModel)]="title" placeholder="Ej. Medicinas listas" />
 
       <label>Descripción</label>
-      <textarea rows="3" [(ngModel)]="description"></textarea>
+      <textarea rows="3" [(ngModel)]="description" placeholder="Escriba los detalles..."></textarea>
 
       <label>Tipo</label>
       <select [(ngModel)]="type">
-        <option value="info">Info</option>
+        <option value="info">Información</option>
         <option value="urgent">Urgente</option>
         <option value="warning">Advertencia</option>
         <option value="success">Éxito</option>
       </select>
 
-      <button class="btn" (click)="create()">Crear Notificación</button>
+      <button class="btn btn-primary" (click)="create()">Crear Notificación</button>
     </div>
 
     <div class="list">
-      <div *ngFor="let n of notifications" class="card item">
-        <div class="item-main">
-          <strong>{{ n.title }}</strong>
+      <h3 class="section-title">Historial de Notificaciones</h3>
+
+      <div *ngFor="let n of notifications" class="card item" [ngClass]="n.type">
+        <div class="item-left">
+          <div class="item-title">{{ n.title }}</div>
           <div class="item-desc">{{ n.description }}</div>
+          <div class="badge" [ngClass]="n.type">{{ n.type | titlecase }}</div>
         </div>
-        <div class="item-meta">
-          <div>{{ n.date }}</div>
-          <div class="small">De: {{ n.sender || 'Sistema' }}</div>
-          <div><button (click)="markAsRead(n.id)">Marcar leído</button></div>
+
+        <div class="item-right">
+          <div class="date">{{ n.date }}</div>
+          <div class="sender">Enviado por: <strong>{{ n.sender || 'Sistema' }}</strong></div>
+
+          <button class="btn btn-small btn-secondary" (click)="markAsRead(n.id)">
+            Marcar como leído
+          </button>
         </div>
       </div>
     </div>

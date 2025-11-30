@@ -1,5 +1,4 @@
 import type { Routes } from "@angular/router"
-import { PatientsComponent } from "./patients/patients.component"
 
 export const FAMILIAR_ROUTES: Routes = [
   {
@@ -31,8 +30,5 @@ export const FAMILIAR_ROUTES: Routes = [
     path: "pages",
     loadComponent: () => import("./components/pages/pages.component").then((m) => m.PagesComponent),
   },
-  {
-    path: "patients",
-    component: PatientsComponent,
-  },
+
 ]

@@ -47,7 +47,6 @@
   border: 1px solid #eef2ff;
 }
 
-/* Styles for notification types */
 .notification-item.type-urgent {
   background: #fee2e2;
   border-color: #dc2626;
@@ -63,18 +62,17 @@
   border-color: #d97706;
 }
 
-/* Styles for notification states */
 .notification-item.unread {
-  background-color: #f0f4f8; /* Light background for unread */
-  border-left: 4px solid #3b82f6; /* Blue border for unread */
+  background-color: #f0f4f8;
+  border-left: 4px solid #3b82f6;
 }
 
 .notification-item.read {
-  opacity: 0.8; /* Slightly dim read notifications */
+  opacity: 0.8;
 }
 
 .notification-item.archived {
-  opacity: 0.5; /* Significantly dim archived notifications */
+  opacity: 0.5;
   filter: grayscale(50%);
 }
 
@@ -109,7 +107,7 @@
   background: #eef2ff;
   color: #284088;
   cursor: pointer;
-  white-space: nowrap; /* Prevent button text from wrapping */
+  white-space: nowrap;
 }
 
 .btn-action.btn-delete {
@@ -205,7 +203,6 @@
   color: #6b7280;
 }
 
-/* Notification filters styles */
 .notification-filters {
   display: flex;
   gap: 8px;
@@ -228,7 +225,7 @@
 }
 
 .filter-btn.active {
-  background-color: #2563eb; /* Blue for active filter */
+  background-color: #2563eb;
   color: white;
   border-color: #2563eb;
   font-weight: 600;

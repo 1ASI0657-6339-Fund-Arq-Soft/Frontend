@@ -1,8 +1,10 @@
 <app-cuidador-layout>
   <div class="food-admin">
-    <h2>Gestión de Alimentos</h2>
+    <h2 class="title">Gestión de Alimentos</h2>
 
     <div class="form card">
+      <h3 class="section-title">{{ editingId ? 'Editar Registro' : 'Nuevo Registro' }}</h3>
+
       <label>Destinatario</label>
       <select [(ngModel)]="selectedFamiliaId">
         <option [value]="null">Seleccione un familiar</option>
@@ -17,28 +19,42 @@
       </select>
 
       <label>Descripción</label>
-      <input type="text" [(ngModel)]="description" />
+      <input type="text" [(ngModel)]="description" placeholder="Ej. Pan con queso, jugo de naranja" />
 
-      <label>Fecha</label>
-      <input type="date" [(ngModel)]="date" />
+      <div class="grid-2">
+        <div>
+          <label>Fecha</label>
+          <input type="date" [(ngModel)]="date" />
+        </div>
 
-      <label>Hora</label>
-      <input type="time" [(ngModel)]="time" />
+        <div>
+          <label>Hora</label>
+          <input type="time" [(ngModel)]="time" />
+        </div>
+      </div>
 
-      <button class="btn" (click)="save()">{{ editingId ? 'Guardar' : 'Agregar' }}</button>
+      <button class="btn btn-primary" (click)="save()">
+        {{ editingId ? 'Guardar Cambios' : 'Agregar Registro' }}
+      </button>
     </div>
 
     <div class="entries">
+      <h3 class="section-title">Historial de alimentos</h3>
+
       <div *ngFor="let e of entries" class="card entry">
-        <div class="entry-main">
-          <div class="entry-title">{{ e.meal | titlecase }}</div>
+        <div class="entry-left">
+          <div class="entry-meal">{{ e.meal | titlecase }}</div>
           <div class="entry-desc">{{ e.description }}</div>
         </div>
-        <div class="entry-meta">
-          <div class="entry-date">{{ e.date }} <span class="entry-time">{{ e.time }}</span></div>
+
+        <div class="entry-right">
+          <div class="entry-datetime">
+            {{ e.date }} • <span>{{ e.time }}</span>
+          </div>
+
           <div class="entry-actions">
-            <button (click)="startEdit(e)">Editar</button>
-            <button (click)="remove(e.id)">Eliminar</button>
+            <button class="btn btn-small" (click)="startEdit(e)">Editar</button>
+            <button class="btn btn-danger btn-small" (click)="remove(e.id)">Eliminar</button>
           </div>
         </div>
       </div>

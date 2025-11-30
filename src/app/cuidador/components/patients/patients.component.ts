@@ -1,18 +1,29 @@
-import { Component } from "@angular/core"
-import { CommonModule } from "@angular/common"
-import { LayoutComponent } from "../layout/layout.component"
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { LayoutComponent } from '../layout/layout.component';
+import { PatientService } from '../../../core/services/patient.service';
+import { Patient } from '../../../core/models/patient.model';
 
 @Component({
-  selector: "app-patients",
+  selector: 'app-patients',
   standalone: true,
   imports: [CommonModule, LayoutComponent],
-  templateUrl: "./patients.component.html",
-  styleUrls: ["./patients.component.css"],
+  templateUrl: './patients.component.html',
+  styleUrls: ['./patients.component.css'],
 })
-export class PatientsComponent {
-  patients = [
-    { id: 1, name: "Carlos García", age: 78, room: "101", condition: "Estable", medications: 5 },
-    { id: 2, name: "Maria López", age: 82, room: "102", condition: "Estable", medications: 3 },
-    { id: 3, name: "Juan Pérez", age: 75, room: "103", condition: "Monitoreado", medications: 4 },
-  ]
+export class PatientsComponent implements OnInit {
+  patients: Patient[] = [];
+
+  constructor(private patientService: PatientService) {}
+
+  ngOnInit(): void {
+    this.loadPatients();
+  }
+
+  loadPatients(): void {
+    this.patientService.getAllPatients().subscribe({
+      next: (data) => (this.patients = data),
+      error: (err) => console.error('Error cargando pacientes:', err),
+    });
+  }
 }

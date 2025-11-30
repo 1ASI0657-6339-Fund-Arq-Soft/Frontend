@@ -1,8 +1,7 @@
 export interface Patient {
-  id: number;
-  firstName: string;
-  lastName: string;
-  dateOfBirth: Date;
-  phone: string;
-  email?: string;
+  id?: number;
+  name: string;
+  age: number;
+  condition: string;
+  caregiverId: number;
 }

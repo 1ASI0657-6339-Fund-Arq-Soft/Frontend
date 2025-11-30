@@ -26,7 +26,7 @@ export const CUIDADOR_ROUTES: Routes = [
     path: "food",
     loadComponent: () => import("./components/food/food.component").then((m) => m.FoodComponent),
   },
-  
+
   {
     path: "nurses",
     component: NursesComponent,

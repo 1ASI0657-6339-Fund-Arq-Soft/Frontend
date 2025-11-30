@@ -7,23 +7,15 @@ import { Patient } from '../models/patient.model';
   providedIn: 'root'
 })
 export class PatientService {
-  private apiUrl = '/api/patients';
+  private apiUrl = 'http://localhost:3000';
 
   constructor(private http: HttpClient) {}
 
-  getPatients(): Observable<Patient[]> {
-    return this.http.get<Patient[]>(this.apiUrl);
+  getAllPatients(): Observable<Patient[]> {
+    return this.http.get<Patient[]>(`${this.apiUrl}/patients`);
   }
 
-  createPatient(patient: Patient): Observable<Patient> {
-    return this.http.post<Patient>(this.apiUrl, patient);
-  }
-
-  updatePatient(id: number, patient: Partial<Patient>): Observable<Patient> {
-    return this.http.put<Patient>(`${this.apiUrl}/${id}`, patient);
-  }
-
-  deletePatient(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  addPatient(patient: Patient): Observable<Patient> {
+    return this.http.post<Patient>(`${this.apiUrl}/patients`, patient);
   }
 }
