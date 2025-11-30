@@ -1,0 +1,144 @@
+.citas-page {
+  padding: 25px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-secondary {
+  background: #e4e6ea;
+}
+
+.btn-danger {
+  background: #ff4d4d;
+  color: white;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.citas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.cita-card {
+  display: flex;
+  justify-content: space-between;
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.cita-info {
+  max-width: 70%;
+}
+
+.cita-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.cita-meta {
+  color: #555;
+  font-size: 14px;
+}
+
+.cita-specialty {
+  margin: 5px 0;
+  color: #333;
+}
+
+.cita-status {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+.cita-status.pendiente {
+  background: #ffeeba;
+  color: #856404;
+}
+
+.cita-status.finalizada {
+  background: #d4edda;
+  color: #155724;
+}
+
+.cita-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-card {
+  background: white;
+  width: 400px;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.modal-title {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}

@@ -1,0 +1,69 @@
+<app-cuidador-layout>
+  <div class="citas-page">
+
+    <div class="page-header">
+      <h2 class="page-title">Gestión de Citas</h2>
+      <button class="btn-primary" (click)="openCreateModal()">+ Nueva Cita</button>
+    </div>
+    <div class="citas-list">
+      <div *ngFor="let c of (appointments$ | async)" class="cita-card">
+
+        <div class="cita-info">
+          <h3 class="cita-title">{{ c.title }}</h3>
+          <p class="cita-meta">{{ c.start | date:'medium' }}</p>
+          <p class="cita-meta">{{ c.end | date:'medium' }}</p>
+
+          <p class="cita-specialty" *ngIf="c.specialty">
+            <strong>Especialidad:</strong> {{ c.specialty }}
+          </p>
+
+          <span class="cita-status"
+                [ngClass]="{ 'pendiente': c.status === 'pendiente',
+                             'finalizada': c.status === 'finalized'}">
+            {{ c.status || 'pendiente' }}
+          </span>
+        </div>
+
+        <div class="cita-actions">
+          <button class="btn-secondary" (click)="viewAppointment(c)">Ver</button>
+          <button class="btn-secondary" (click)="editAppointment(c)">Editar</button>
+          <button class="btn-danger" (click)="deleteAppointment(c.id)">Eliminar</button>
+          <button class="btn-success" (click)="finalizeAppointment(c.id)">Finalizar</button>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="showModal" class="modal-overlay">
+      <div class="modal-card">
+
+        <h3 class="modal-title">
+          {{ selectedAppointment ? "Editar Cita" : "Nueva Cita" }}
+        </h3>
+
+        <form [formGroup]="appointmentForm" (ngSubmit)="saveAppointment()" class="modal-form">
+
+          <label>Título</label>
+          <input formControlName="title" class="form-input"/>
+
+          <label>Inicio</label>
+          <input type="datetime-local" formControlName="start" class="form-input"/>
+
+          <label>Fin</label>
+          <input type="datetime-local" formControlName="end" class="form-input"/>
+
+          <label>Especialidad</label>
+          <input formControlName="specialty" class="form-input"/>
+
+          <label>Descripción</label>
+          <textarea formControlName="description" class="form-input"></textarea>
+
+          <div class="modal-actions">
+            <button type="submit" class="btn-primary">Guardar</button>
+            <button type="button" class="btn-secondary" (click)="closeModal()">Cancelar</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</app-cuidador-layout>
