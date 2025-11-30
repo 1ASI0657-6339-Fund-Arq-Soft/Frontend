@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LayoutComponent } from '../layout/layout.component';
-import { PatientService } from '../../../core/services/patient.service';
-import { Patient } from '../../../core/models/patient.model';
+import { User } from '../../../core/models/user.model';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-patients',
@@ -12,18 +12,12 @@ import { Patient } from '../../../core/models/patient.model';
   styleUrls: ['./patients.component.css'],
 })
 export class PatientsComponent implements OnInit {
-  patients: Patient[] = [];
+  users: User[] = [];
 
-  constructor(private patientService: PatientService) {}
+  constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.loadPatients();
-  }
-
-  loadPatients(): void {
-    this.patientService.getAllPatients().subscribe({
-      next: (data) => (this.patients = data),
-      error: (err) => console.error('Error cargando pacientes:', err),
-    });
+    this.users = this.authService.getFamiliares();
+    console.log('Usuarios familiares:', this.users);
   }
 }

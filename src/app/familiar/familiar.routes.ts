@@ -26,9 +26,4 @@ export const FAMILIAR_ROUTES: Routes = [
     path: "resident-profile",
     loadComponent: () => import("./components/resident-profile/resident-profile.component").then((m) => m.ResidentProfileComponent),
   },
-  {
-    path: "pages",
-    loadComponent: () => import("./components/pages/pages.component").then((m) => m.PagesComponent),
-  },
-
 ]

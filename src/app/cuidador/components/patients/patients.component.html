@@ -1,17 +1,18 @@
 <app-cuidador-layout>
-  <div class="patients-container">
+    <div class="patients-container">
+      <h1>Mis Pacientes</h1>
 
-    <h2>Pacientes Registrados</h2>
+      <div *ngIf="users.length === 0" class="no-patients">
+        No tienes pacientes asignados.
+      </div>
 
-    <div *ngIf="patients.length === 0" class="empty-box">
-      <p>No hay pacientes registrados.</p>
+      <ul *ngIf="users.length > 0" class="patients-list">
+        <li *ngFor="let user of users" class="patient-card">
+          <h2>{{ user.name }}</h2>
+          <p><strong>Email:</strong> {{ user.email }}</p>
+          <p><strong>ID:</strong> {{ user.id }}</p>
+        </li>
+      </ul>
     </div>
 
-    <ul *ngIf="patients.length > 0" class="patients-list">
-      <li *ngFor="let p of patients" class="patient-item">
-        <strong>{{ p.name }}</strong>
-        <span>— {{ p.condition }}</span>
-      </li>
-    </ul>
-  </div>
 </app-cuidador-layout>
