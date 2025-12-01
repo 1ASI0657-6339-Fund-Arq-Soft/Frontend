@@ -48,8 +48,8 @@ export class CryptoService {
    * For now, we return password as-is to match current backend behavior
    */
   async compatibilityHash(password: string): Promise<string> {
-    console.warn('⚠️ Using plaintext passwords due to backend inconsistency');
-    console.warn('⚠️ Backend needs to be fixed: either hash in signup OR use plaintext comparison in signin');
+    console.warn('Using plaintext passwords due to backend inconsistency');
+    console.warn('Backend needs to be fixed: either hash in signup OR use plaintext comparison in signin');
     return password;
   }
 }

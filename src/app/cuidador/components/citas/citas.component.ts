@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from "@angula
 import { AppointmentApiService } from '../../../core/services/appointment-api.service';
 import { ResidentsApiService } from '../../../core/services/residents-api.service';
 import { UsersApiService } from '../../../core/services/users-api.service';
-import { Observable } from "rxjs";
+import { Observable, take, map } from "rxjs";
 import type { AppointmentResource, CreateAppointmentResource } from '../../../core/models/generated/appointments.types';
 import type { ResidentResource } from '../../../core/models/generated/residents.types';
 import type { DoctorResource } from '../../../core/models/generated/users.types';
@@ -38,38 +38,38 @@ export class CitasComponent implements OnInit {
     this.appointments$ = this.appointmentApi.getAll();
     
     console.log('[Citas Component] 🏥 Cargando residentes...');
-    console.log('[Citas Component] URL: GET /api/v1/residents');
-    this.residentsApi.getAll().subscribe({
-      next: (r) => {
-        console.log('[Citas Component] ✅ Residentes cargados:', r);
+    console.log('[Citas Component] URL: GET /api/v1/family-members');
+    this.usersApi.getAllFamilyMembers().subscribe({
+      next: (r: any) => {
+        console.log('[Citas Component] Residentes cargados:', r);
         console.log('[Citas Component] Cantidad de residentes:', r.length);
         this.residents = r;
         
         if (r.length === 0) {
-          console.warn('[Citas Component] ⚠️ No hay residentes disponibles');
+          console.warn('[Citas Component] No hay residentes disponibles');
         }
       },
-      error: (e) => {
-        console.error('[Citas Component] ❌ Error al cargar residentes:', e);
+      error: (e: any) => {
+        console.error('[Citas Component] Error al cargar residentes:', e);
         console.error('[Citas Component] Status:', e.status, 'URL:', e.url);
         this.residents = [];
       }
     });
     
-    console.log('[Citas Component] 👨‍⚕️ Cargando doctores...');
+    console.log('[Citas Component] Cargando doctores...');
     console.log('[Citas Component] URL: GET /api/v1/doctors');
     this.usersApi.getAllDoctors().subscribe({
-      next: (d) => {
-        console.log('[Citas Component] ✅ Doctores cargados:', d);
+      next: (d: any) => {
+        console.log('[Citas Component] Doctores cargados:', d);
         console.log('[Citas Component] Cantidad de doctores:', d.length);
         this.doctors = d;
         
         if (d.length === 0) {
-          console.warn('[Citas Component] ⚠️ No hay doctores disponibles');
+          console.warn('[Citas Component] No hay doctores disponibles');
         }
       },
-      error: (e) => {
-        console.error('[Citas Component] ❌ Error al cargar doctores:', e);
+      error: (e: any) => {
+        console.error('[Citas Component] Error al cargar doctores:', e);
         console.error('[Citas Component] Status:', e.status, 'URL:', e.url);
         this.doctors = [];
       }
@@ -108,14 +108,14 @@ export class CitasComponent implements OnInit {
       status: 'pending'
     });
     
-    console.log('[CitasComponent] 🔄 Modal abierto con fecha:', defaultDate);
+    console.log('[CitasComponent] Modal abierto con fecha:', defaultDate);
   }
   closeModal() {
     this.showModal = false;
   }
   saveAppointment() {
     if (this.appointmentForm.invalid) {
-      console.log('[CitasComponent] ❌ Formulario inválido:', this.appointmentForm.errors);
+      console.log('[CitasComponent] Formulario inválido:', this.appointmentForm.errors);
       return;
     }
 
@@ -124,7 +124,7 @@ export class CitasComponent implements OnInit {
 
     // Validar datos antes de procesar
     if (!payload.residentId || !payload.doctorId || !payload.date) {
-      console.error('[CitasComponent] ❌ Faltan campos requeridos');
+      console.error('[CitasComponent] Faltan campos requeridos');
       return;
     }
 
@@ -133,7 +133,7 @@ export class CitasComponent implements OnInit {
     const minute = parseInt(payload.timeMinute) || 0;
     
     if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-      console.error('[CitasComponent] ❌ Hora inválida:', { hour, minute });
+      console.error('[CitasComponent] Hora inválida:', { hour, minute });
       return;
     }
     
@@ -231,10 +231,20 @@ export class CitasComponent implements OnInit {
   finalizeAppointment(id: number | undefined) {
     if (!id) return;
 
-    this.appointmentApi.getById(id as number).subscribe((a) => {
-      if (!a) return
-      const payload = { ...a, status: 'finalized' }
-      this.appointmentApi.update(id as number, payload).subscribe(() => this.refreshList())
-    })
+    console.log(`[CitasComponent] Finalizando cita con ID: ${id}`);
+    
+    // Solo enviamos el status para evitar conflictos de validación en el backend
+    const payload = { status: 'finalized' };
+    console.log(`[CitasComponent] Actualizando solo status:`, payload);
+    
+    this.appointmentApi.update(id, payload).subscribe({
+      next: () => {
+        console.log(`[CitasComponent] Cita ${id} finalizada exitosamente`);
+        this.refreshList();
+      },
+      error: (error) => {
+        console.error(`[CitasComponent] Error al finalizar cita ${id}:`, error);
+      }
+    });
   }
 }

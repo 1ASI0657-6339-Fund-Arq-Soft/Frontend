@@ -109,7 +109,7 @@ export class AuthService {
       roles: [roleMapping[request.role as keyof typeof roleMapping]]
     }).pipe(
       switchMap((userResource) => {
-        console.log('[AuthService] ✅ Usuario IAM creado:', userResource);
+        console.log('[AuthService] Usuario IAM creado:', userResource);
         console.log('[AuthService] ⭐ EJECUTANDO LOGICA DE SWITCHMAP');
         console.log('[AuthService] ⭐ ROLE ES:', request.role);
         console.log('[AuthService] ⭐ RESIDENT NAME ES:', request.residentName);
@@ -153,7 +153,7 @@ export class AuthService {
           const requiredFields = ['dni', 'firstName', 'lastName', 'street', 'city', 'state', 'country', 'zipCode', 'gender', 'birthDate', 'receiptId'];
           requiredFields.forEach(field => {
             const value = (residentData as any)[field];
-            console.log(`  - ${field}: ${value} (${typeof value}) - ${value ? '✅' : '❌'}`);
+            console.log(`  - ${field}: ${value} (${typeof value}) - ${value ? 'Valid' : 'Invalid'}`);
           });
           
           console.log('[AuthService] 🏠 Datos del residente preparados:', residentData);
@@ -161,7 +161,7 @@ export class AuthService {
           
           return this.residentsApi.create(residentData).pipe(
             switchMap((resident) => {
-              console.log('[AuthService] ✅ Residente creado:', resident);
+              console.log('[AuthService] Residente creado:', resident);
               
               // 3. Crear familiar vinculado al residente
               const familyMemberData = {
@@ -179,7 +179,7 @@ export class AuthService {
               
               return this.usersApi.createFamilyMember(familyMemberData).pipe(
                 map((familyMember) => {
-                  console.log('[AuthService] ✅ Familiar creado:', familyMember);
+                  console.log('[AuthService] Familiar creado:', familyMember);
                   console.log('[AuthService] 🎉 Registro completo exitoso!');
                   
                   const user: User = { 
@@ -198,7 +198,7 @@ export class AuthService {
           );
         } else if (request.role === 'doctor' && request.licenseNumber && request.specialty) {
           console.log('[AuthService] ⭐⭐⭐ ENTRANDO EN CREACION DE DOCTOR');
-          console.log('[AuthService] 👨‍⚕️ Creando doctor...');
+          console.log('[AuthService] Creando doctor...');
           console.log('[AuthService] 🔍 Datos del doctor a crear:', request);
           
           // Crear doctor en microservicio de usuarios
@@ -226,7 +226,7 @@ export class AuthService {
           
           return this.usersApi.createDoctor(doctorData).pipe(
             map((doctor) => {
-              console.log('[AuthService] ✅ Doctor creado:', doctor);
+              console.log('[AuthService] Doctor creado:', doctor);
               console.log('[AuthService] 🎉 Registro de doctor completo exitoso!');
               
               const user: User = { 
@@ -242,8 +242,8 @@ export class AuthService {
         } else {
           // Para otros roles, solo crear el usuario
           console.log('[AuthService] ⭐⭐⭐ ENTRANDO EN ELSE - REGISTRO BASICO');
-          console.log('[AuthService] ⚠️  Registro básico para rol:', request.role);
-          console.log('[AuthService] ✅ Registro básico completado para rol:', request.role);
+          console.log('[AuthService] Registro básico para rol:', request.role);
+          console.log('[AuthService] Registro básico completado para rol:', request.role);
           const user: User = { 
             id: String(userResource.id ?? ''), 
             email: userResource.username ?? '', 
@@ -254,7 +254,7 @@ export class AuthService {
         }
       }),
       catchError((error) => {
-        console.error('[AuthService] ❌ Error en registro:', error);
+        console.error('[AuthService] Error en registro:', error);
         return throwError(() => error);
       })
     )

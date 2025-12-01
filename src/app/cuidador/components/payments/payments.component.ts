@@ -61,18 +61,18 @@ export class PaymentsComponent implements OnInit, OnDestroy {
     this.loadingFamiliares = true
     this.usersApi.getAllFamilyMembers().subscribe({
       next: (list) => {
-        console.log('[Payments Component] ✅ Familiares raw del microservicio:', list);
+        console.log('[Payments Component] Familiares raw del microservicio:', list);
         console.log('[Payments Component] Cantidad recibida:', list.length);
         this.familiares = list.map(fm => this.mapFamilyMemberResourceToUser(fm))
-        console.log('[Payments Component] ✅ Familiares mapeados:', this.familiares);
+        console.log('[Payments Component] Familiares mapeados:', this.familiares);
         this.loadingFamiliares = false
         
         if (this.familiares.length === 0) {
-          console.warn('[Payments Component] ⚠️ No hay familiares disponibles');
+          console.warn('[Payments Component] No hay familiares disponibles');
         }
       },
       error: (e) => { 
-        console.error('[Payments Component] ❌ Error detallado al cargar familiares:', e);
+        console.error('[Payments Component] Error detallado al cargar familiares:', e);
         console.error('[Payments Component] Status:', e.status);
         console.error('[Payments Component] Message:', e.message);
         console.error('[Payments Component] URL:', e.url);

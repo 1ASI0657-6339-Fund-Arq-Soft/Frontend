@@ -42,16 +42,16 @@ export class FoodComponent implements OnInit, OnDestroy {
     console.log('[Cuidador Food] URL que se va a llamar: GET /api/v1/family-members');
     this.usersApi.getAllFamilyMembers().subscribe({ 
       next: (list) => {
-        console.log('[Cuidador Food] ✅ Familiares cargados exitosamente:', list);
+        console.log('[Cuidador Food] Familiares cargados exitosamente:', list);
         console.log('[Cuidador Food] Cantidad de familiares:', list.length);
         this.familiares = list;
         
         if (list.length === 0) {
-          console.warn('[Cuidador Food] ⚠️ No se encontraron familiares en el microservicio');
+          console.warn('[Cuidador Food] No se encontraron familiares en el microservicio');
         }
       }, 
       error: (e) => { 
-        console.error('[Cuidador Food] ❌ Error al cargar familiares:', e); 
+        console.error('[Cuidador Food] Error al cargar familiares:', e); 
         console.error('[Cuidador Food] Error completo:', JSON.stringify(e, null, 2));
         this.familiares = []; 
       } 

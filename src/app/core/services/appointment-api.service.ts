@@ -36,16 +36,12 @@ export class AppointmentApiService {
   }
 
   getById(id: number): Observable<AppointmentResource> {
-    console.log(`[AppointmentApiService] Obteniendo cita con ID: ${id}`);
-    return this.http.get<AppointmentResource>(`${this.baseUrl}/${id}`, this.getHttpOptions()).pipe(
-      tap(appointment => {
-        console.log('[AppointmentApiService] Cita obtenida:', appointment);
-      }),
-      catchError((e) => {
-        console.error(`[AppointmentApiService] Error al obtener cita ${id}:`, e);
-        return throwError(() => this.normalize(e));
-      })
-    );
+    console.warn(`[AppointmentApiService] getById() no está disponible en el backend. Use getAll() y filtre en el frontend.`);
+    return throwError(() => ({ 
+      status: 405, 
+      message: "Endpoint GET /{id} no está disponible. Use getAll() y filtre en el frontend.",
+      details: `Attempted to get appointment with id: ${id}` 
+    }));
   }
 
   create(payload: CreateAppointmentResource): Observable<AppointmentResource> {

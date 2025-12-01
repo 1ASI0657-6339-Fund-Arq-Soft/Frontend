@@ -38,38 +38,39 @@ export class GestionCitasComponent implements OnInit {
     
     console.log(`[GestionCitasComponent] Aceptando cita con ID: ${id}`);
     
-    // Find the appointment in the current list
-    this.appointments$.pipe(
-      take(1),
-      map(appointments => appointments.find(a => a.id === id))
-    ).subscribe(appointment => {
-      if (!appointment) {
-        console.error(`[GestionCitasComponent] No se encontró la cita con ID: ${id}`);
-        return;
+    // Solo enviamos el status para evitar conflictos de validación en el backend
+    const payload = { status: 'accepted' };
+    console.log(`[GestionCitasComponent] Actualizando solo status:`, payload);
+    
+    this.appointmentApi.update(id, payload).subscribe({
+      next: () => {
+        console.log(`[GestionCitasComponent] Cita ${id} aceptada exitosamente`);
+        this.appointments$ = this.appointmentApi.getAll();
+      },
+      error: (error) => {
+        console.error(`[GestionCitasComponent] Error al aceptar cita ${id}:`, error);
       }
-      
-      const payload = { ...appointment, status: 'accepted' };
-      console.log(`[GestionCitasComponent] Actualizando cita:`, payload);
-      
-      this.appointmentApi.update(id, payload).subscribe({
-        next: () => {
-          console.log(`[GestionCitasComponent] Cita ${id} aceptada exitosamente`);
-          this.appointments$ = this.appointmentApi.getAll();
-        },
-        error: (error) => {
-          console.error(`[GestionCitasComponent] Error al aceptar cita ${id}:`, error);
-        }
-      });
     });
   }
 
   reject(id: number | undefined) {
     if (!id) return;
-    this.appointmentApi.getById(id).subscribe((a) => {
-      if (!a) return
-      const payload = { ...a, status: 'rejected' }
-      this.appointmentApi.update(id, payload).subscribe(() => { this.appointments$ = this.appointmentApi.getAll() })
-    })
+    
+    console.log(`[GestionCitasComponent] Rechazando cita con ID: ${id}`);
+    
+    // Solo enviamos el status para evitar conflictos de validación en el backend
+    const payload = { status: 'rejected' };
+    console.log(`[GestionCitasComponent] Actualizando solo status:`, payload);
+    
+    this.appointmentApi.update(id, payload).subscribe({
+      next: () => {
+        console.log(`[GestionCitasComponent] Cita ${id} rechazada exitosamente`);
+        this.appointments$ = this.appointmentApi.getAll();
+      },
+      error: (error) => {
+        console.error(`[GestionCitasComponent] Error al rechazar cita ${id}:`, error);
+      }
+    });
   }
 
   view(a: AppointmentResource) {
