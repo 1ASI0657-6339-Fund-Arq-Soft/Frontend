@@ -5,10 +5,15 @@ import { LayoutComponent } from '../layout/layout.component'
 import { PaymentsService } from '../../../core/services/payments.service'
 import { NotificationsService } from '../../../core/services/notifications.service'
 import { AuthService } from '../../../core/services/auth.service'
+import { UsersApiService } from '../../../core/services/users-api.service'
+import { API_CONFIG } from '../../../core/config/api-config'
 import { StripeService } from '../../../core/services/stripe.service'
 import type { Payment } from '../../../core/models/payment.model'
 import type { User } from '../../../core/models/user.model'
 import { Subscription } from 'rxjs'
+
+import type { FamilyMemberResource } from '../../../core/models/generated/users.types'
+// ... (other imports)
 
 @Component({
   selector: 'app-cuidador-payments',
@@ -20,21 +25,40 @@ import { Subscription } from 'rxjs'
 export class PaymentsComponent implements OnInit, OnDestroy {
   payments: Payment[] = []
   familiares: User[] = []
+  loadingFamiliares: boolean = false
+  backendErrorFamiliares: string | null = null
   selectedFamiliaId: string | null = null
-  period = ''
-  concept = ''
-  amount = ''
+  period: string = ''
+  concept: string = ''
+  amount: string = ''
   private sub: Subscription | null = null
+
+  private mapFamilyMemberResourceToUser(fm: FamilyMemberResource): User {
+    return {
+      id: String(fm.id ?? ''),
+      email: fm.contactEmail?.address?.street ?? '', // Placeholder, as email is not directly available
+      name: `${fm.fullName?.firstName ?? ''} ${fm.fullName?.lastName ?? ''}`.trim(),
+      role: 'familiar',
+    }
+  }
 
   constructor(
     private paymentsService: PaymentsService,
     private notificationsService: NotificationsService,
     private authService: AuthService,
     private stripeService: StripeService,
+    private usersApi: UsersApiService,
   ) {}
 
   ngOnInit(): void {
-    this.familiares = this.authService.getFamiliares()
+    this.loadingFamiliares = true
+    this.usersApi.getAllFamilyMembers().subscribe({
+      next: (list) => {
+        this.familiares = list.map(fm => this.mapFamilyMemberResourceToUser(fm))
+        this.loadingFamiliares = false
+      },
+      error: (e) => { this.backendErrorFamiliares = e?.message ?? 'Failed to load family members'; this.loadingFamiliares = false; this.familiares = [] }
+    })
     this.sub = this.paymentsService.payments$.subscribe((items) => {
       this.payments = items
       console.log('[Cuidador Payments] payments', items)
@@ -44,23 +68,29 @@ export class PaymentsComponent implements OnInit, OnDestroy {
   createRequest() {
     if (!this.period || !this.concept || !this.amount || !this.selectedFamiliaId) return
     const currentUser = this.authService.getCurrentUser()
-    const created = this.paymentsService.createRequest({
+    this.paymentsService.createRequest({
       period: this.period,
       concept: this.concept,
       amount: this.amount,
       requester: currentUser?.name || 'Cuidador',
       requesterId: currentUser?.id,
       payerId: this.selectedFamiliaId,
-    })
-
-    // notify the familiar (recipient only)
-    this.notificationsService.createNotification({
-      title: 'Nueva solicitud de pago',
-      description: `${created.requester} solicita ${created.amount} por ${created.concept} (${created.period})`,
-      type: 'info',
-      date: created.createdAt || new Date().toLocaleString(),
-      sender: created.requester,
-      recipientId: this.selectedFamiliaId,
+    }).subscribe({
+      next: (created: Payment) => {
+        // notify the familiar (recipient only) once backend confirms
+        this.notificationsService.createNotification({
+          title: 'Nueva solicitud de pago',
+          description: `${created.requester} solicita ${created.amount} por ${created.concept} (${created.period})`,
+          type: 'info',
+          date: created.createdAt || new Date().toLocaleString(),
+          sender: created.requester,
+          recipientId: this.selectedFamiliaId ?? undefined,
+        })
+      },
+      error: (e: any) => {
+        console.error('Failed to create payment', e)
+        alert('Error creando solicitud de pago: ' + (e?.message ?? String(e)))
+      }
     })
 
     this.period = ''

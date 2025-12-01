@@ -1,6 +1,9 @@
-import { Component } from "@angular/core"
+import { Component, OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { LayoutComponent } from "../layout/layout.component"
+import { AppointmentApiService } from '../../../core/services/appointment-api.service'
+import type { AppointmentResource } from '../../../core/models/generated/appointments.types'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: "app-appointments",
@@ -9,53 +12,43 @@ import { LayoutComponent } from "../layout/layout.component"
   templateUrl: "./appointments.component.html",
   styleUrls: ["./appointments.component.css"],
 })
-export class AppointmentsComponent {
-  appointments = [
-    {
-      id: 1,
-      title: "Consulta Médica",
-      date: "2025-01-15",
-      time: "10:00",
-      doctor: "Dr. Juan Pérez",
-      status: "Confirmada",
-    },
-    {
-      id: 2,
-      title: "Terapia Física",
-      date: "2025-01-18",
-      time: "14:00",
-      doctor: "Lic. María González",
-      status: "Pendiente",
-    },
-    {
-      id: 3,
-      title: "Laboratorio",
-      date: "2025-01-20",
-      time: "09:30",
-      doctor: "Centro Diagnóstico",
-      status: "Confirmada",
-    },
-  ]
+export class AppointmentsComponent implements OnInit {
+  appointments: AppointmentResource[] = []
 
   editingId: number | null = null
-  editingData: any = {}
+  editingData: Partial<AppointmentResource> = {}
+  private sub: Subscription | null = null
 
-  editAppointment(appointment: any): void {
-    this.editingId = appointment.id
+  constructor(private appointmentApi: AppointmentApiService) {}
+
+  ngOnInit(): void {
+    this.sub = this.appointmentApi.getAll().subscribe({ next: (list: AppointmentResource[]) => this.appointments = list, error: (e: any) => { console.warn('Failed to load appointments', e); this.appointments = [] } })
+  }
+
+  editAppointment(appointment: AppointmentResource): void {
+    this.editingId = appointment.id ?? null
     this.editingData = { ...appointment }
   }
 
   saveAppointment(): void {
-    const index = this.appointments.findIndex((a) => a.id === this.editingId)
-    if (index !== -1) {
-      this.appointments[index] = { ...this.editingData }
-    }
+    // If editingId exists, we update via API, otherwise ignore - add flows intentionally simple for this step
+    if (!this.editingId) return
+    this.appointmentApi.update(this.editingId, this.editingData as any).subscribe({ next: () => this.refreshList(), error: (e: any) => console.warn('Failed to update appointment', e) })
     this.editingId = null
   }
 
   cancelAppointment(appointmentId: number): void {
-    if (confirm("¿Desea cancelar esta cita?")) {
-      this.appointments = this.appointments.filter((a) => a.id !== appointmentId)
-    }
+    if (!appointmentId) return
+    if (!confirm("¿Desea cancelar esta cita?")) return
+    this.appointmentApi.delete(appointmentId).subscribe({ next: () => this.refreshList(), error: (e: any) => console.warn('Failed to delete appointment', e) })
+  }
+
+  refreshList(): void {
+    this.sub?.unsubscribe()
+    this.sub = this.appointmentApi.getAll().subscribe({ next: (list: AppointmentResource[]) => this.appointments = list, error: (e: any) => { console.warn('Failed to refresh appointments', e); this.appointments = [] } })
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe()
   }
 }

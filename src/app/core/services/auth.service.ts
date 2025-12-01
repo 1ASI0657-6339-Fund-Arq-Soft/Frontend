@@ -1,6 +1,9 @@
 import { Injectable } from "@angular/core"
 import { BehaviorSubject, Observable } from "rxjs"
+import { map, switchMap } from 'rxjs/operators'
 import type { User, AuthResponse, LoginRequest, RegisterRequest } from "../models/user.model"
+import { IamApiService } from './iam-api.service'
+import type { AuthenticatedUserResource, SignInResource, SignUpResource } from '../models/generated/iam.types'
 
 @Injectable({
   providedIn: "root",
@@ -12,86 +15,60 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false)
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable()
 
-  private mockUsers: Array<User & { password: string }> = [
-    {
-      id: "1",
-      email: "familiar@test.com",
-      password: "password123",
-      name: "Juan Familiar",
-      role: "familiar" as const,
-    },
-    {
-      id: "2",
-      email: "cuidador@test.com",
-      password: "password123",
-      name: "María Cuidadora",
-      role: "cuidador" as const,
-    },
-    {
-      id: "4",
-      email: "doctor@test.com",
-      password: "password123",
-      name: "Dr. Ana Médico",
-      role: "doctor" as const,
-    },
-  ]
 
-  constructor() {
+
+  constructor(private iam: IamApiService) {
     this.loadUserFromStorage()
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
-    return new Observable((observer) => {
-      setTimeout(() => {
-        const user = this.mockUsers.find((u) => u.email === request.email)
+    return this.iam.signIn({ username: request.email, password: request.password }).pipe(
+      map((res: AuthenticatedUserResource) => {
+        // AuthenticatedUserResource currently doesn't include roles in the OpenAPI spec.
+        // Default to 'familiar' when no role information is available from the sign-in response.
+        const user: User = { id: String(res.id ?? ''), email: res.username ?? '', name: res.username ?? '', role: 'familiar' }
+        const auth: AuthResponse = { user, token: res.token ?? '' }
+        this.setCurrentUser(auth.user, auth.token)
+        return auth
+      })
+    )
+  }
 
-        if (user && user.password === request.password) {
-          const authResponse: AuthResponse = {
-            user: { id: user.id, email: user.email, name: user.name, role: user.role },
-            token: this.generateMockToken(),
-          }
-          this.setCurrentUser(authResponse.user, authResponse.token)
-          observer.next(authResponse)
-          observer.complete()
-        } else {
-          observer.error({ message: "Email o contraseña inválidos" })
-        }
-      }, 500)
-    })
+  // Use remote IAM service to sign-in (returns token from backend)
+  signInRemote(request: SignInResource): Observable<AuthResponse> {
+    return this.iam.signIn(request).pipe(
+      map((res: AuthenticatedUserResource) => {
+        const user: User = { id: String(res.id ?? ''), email: res.username ?? '', name: res.username ?? '', role: 'familiar' }
+        const auth: AuthResponse = { user, token: res.token ?? '' }
+        this.setCurrentUser(auth.user, auth.token)
+        return auth
+      })
+    )
+  }
+
+  signUpRemote(request: SignUpResource): Observable<AuthResponse> {
+    // Create the user then sign-in to obtain token
+    return this.iam.signUp(request).pipe(
+      switchMap(() => this.iam.signIn({ username: request.username || '', password: request.password || '' })),
+      map((res: AuthenticatedUserResource) => {
+        const user: User = { id: String(res.id ?? ''), email: res.username ?? '', name: res.username ?? '', role: 'familiar' }
+        const auth: AuthResponse = { user, token: res.token ?? '' }
+        this.setCurrentUser(auth.user, auth.token)
+        return auth
+      })
+    )
   }
 
   register(request: RegisterRequest): Observable<AuthResponse> {
-    return new Observable((observer) => {
-      setTimeout(() => {
-        const userExists = this.mockUsers.find((u) => u.email === request.email)
-
-        if (userExists) {
-          observer.error({ message: "El email ya está registrado" })
-          return
-        }
-
-        const newUser: User = {
-          id: Math.random().toString(36).substr(2, 9),
-          email: request.email,
-          name: request.name,
-          role: request.role,
-        }
-
-        this.mockUsers.push({
-          ...newUser,
-          password: request.password,
-        })
-
-        const authResponse: AuthResponse = {
-          user: newUser,
-          token: this.generateMockToken(),
-        }
-
-        this.setCurrentUser(newUser, authResponse.token)
-        observer.next(authResponse)
-        observer.complete()
-      }, 500)
-    })
+    return this.iam.signUp({ username: request.email, password: request.password }).pipe(
+      switchMap(() => this.iam.signIn({ username: request.email, password: request.password })),
+      map((res: AuthenticatedUserResource) => {
+        const user: User = { id: String(res.id ?? ''), email: res.username ?? '', name: res.username ?? '', role: request.role }
+        const auth: AuthResponse = { user, token: res.token ?? '' }
+        this.setCurrentUser(auth.user, auth.token)
+        return auth
+      })
+    )
   }
 
   logout(): void {
@@ -134,15 +111,26 @@ export class AuthService {
     }
   }
 
-  private generateMockToken(): string {
-    return "mock_token_" + Math.random().toString(36).substr(2, 9)
+
+
+  getAllUsers(): Observable<User[]> {
+    return this.iam.getUsers().pipe(
+      map(userResources => userResources.map(res => {
+        const rawRole = (res.roles && res.roles.length > 0) ? res.roles[0] : 'familiar'
+        const safeRole = (rawRole === 'familiar' || rawRole === 'cuidador' || rawRole === 'doctor') ? rawRole : 'familiar'
+        return {
+          id: String(res.id ?? ''),
+          email: res.username ?? '',
+          name: res.username ?? '',
+          role: safeRole as User['role']
+        }
+      }))
+    )
   }
 
-  getAllUsers(): User[] {
-    return this.mockUsers.map((u) => ({ id: u.id, email: u.email, name: u.name, role: u.role }))
-  }
-
-  getFamiliares(): User[] {
-    return this.getAllUsers().filter((u) => u.role === 'familiar')
+  getFamiliares(): Observable<User[]> {
+    return this.getAllUsers().pipe(
+      map(users => users.filter(u => u.role === 'familiar'))
+    )
   }
 }

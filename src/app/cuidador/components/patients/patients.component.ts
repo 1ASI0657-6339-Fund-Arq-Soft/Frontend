@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LayoutComponent } from '../layout/layout.component';
-import { User } from '../../../core/models/user.model';
+import type { ResidentResource as Resident } from '../../../core/models/generated/residents.types';
+import { ResidentsApiService } from '../../../core/services/residents-api.service';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -12,12 +13,27 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./patients.component.css'],
 })
 export class PatientsComponent implements OnInit {
-  users: User[] = [];
+  residents: Resident[] = [];
+  loading = false
+  error: string | null = null
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private residentsApi: ResidentsApiService) {}
 
   ngOnInit(): void {
-    this.users = this.authService.getFamiliares();
-    console.log('Usuarios familiares:', this.users);
+    // Prefer to get residents from backend
+    this.loading = true
+    this.residentsApi.getAll().subscribe({
+      next: (list) => {
+        this.residents = list
+        this.loading = false
+      },
+      error: (err) => {
+        // fallback to local familiar users if backend not available
+        console.warn('Residents API error, falling back to mock users', err)
+        this.residents = []
+        this.error = err?.message ?? 'Could not fetch residents from backend'
+        this.loading = false
+      }
+    })
   }
 }

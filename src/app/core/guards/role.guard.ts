@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core"
+import { Injectable, inject } from "@angular/core"
 import { Router, type CanActivateFn, type ActivatedRouteSnapshot } from "@angular/router"
 import { AuthService } from "../services/auth.service"
 
@@ -30,8 +30,8 @@ class RoleGuardService {
 
 export const roleGuard = (requiredRole: string): CanActivateFn => {
   return (route: ActivatedRouteSnapshot, state) => {
-    const authService = new AuthService()
-    const router = new Router()
+    const authService = inject(AuthService)
+    const router = inject(Router)
     const guard = new RoleGuardService(authService, router)
     return guard.canActivate(requiredRole)
   }

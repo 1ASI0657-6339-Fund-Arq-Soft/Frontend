@@ -8,6 +8,8 @@
 
       <div class="form-group">
         <label>Destinatario</label>
+        <div *ngIf="loadingFamiliares">Cargando familiares…</div>
+        <div *ngIf="backendErrorFamiliares" class="text-warning">{{ backendErrorFamiliares }}</div>
         <select [(ngModel)]="selectedFamiliaId">
           <option value="">Seleccione un familiar</option>
           <option *ngFor="let f of familiares" [value]="f.id">{{ f.name }}</option>

@@ -2,8 +2,11 @@ import { Component, OnDestroy, OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { LayoutComponent } from "../layout/layout.component"
 import { NotificationsService } from "../../../core/services/notifications.service"
+import { NotificationApiService } from '../../../core/services/notification-api.service'
+import { API_CONFIG } from '../../../core/config/api-config'
 import { AuthService } from "../../../core/services/auth.service"
 import type { Notification } from "../../../core/models/notification.model"
+import type { NotificationDTO } from "../../../core/models/generated/notifications.types"
 import { BehaviorSubject, combineLatest, map, Observable, Subscription } from "rxjs"
 
 @Component({
@@ -25,8 +28,9 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   filteredNotifications: Observable<Notification[]>
 
   private sub: Subscription | null = null
+  private backendSub: Subscription | null = null
 
-  constructor(private notificationsService: NotificationsService, private authService: AuthService) {
+  constructor(private notificationsService: NotificationsService, private authService: AuthService, private notificationApi: NotificationApiService) {
     console.log('[NotificationsComponent] constructor')
 
     this.filteredNotifications = combineLatest([
@@ -56,6 +60,14 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     console.log('[NotificationsComponent] ngOnInit - subscribing to filtered notifications')
+    // If backend is enabled, fetch user notifications from API
+    if (API_CONFIG.useBackendServices) {
+      this.backendSub = this.authService.currentUser$.subscribe((u) => {
+        if (u && u.id) {
+          this.notificationApi.forUser(u.id).subscribe({ next: (items: NotificationDTO[]) => this.notificationsService.setNotifications(items), error: (e: any) => console.warn('Failed to load backend notifications', e) })
+        }
+      })
+    }
     this.sub = this.filteredNotifications.subscribe((items: Notification[]) => {
       this.notifications = items
       console.log('[NotificationsComponent] received filtered notifications', this.notifications)
@@ -95,6 +107,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe()
+    this.backendSub?.unsubscribe()
     this.currentFilter.complete()
   }
 }

@@ -1,0 +1,8 @@
+<div class="appointments-sample">
+  <h3>Appointments sample</h3>
+  <div *ngIf="loading">Loading appointments…</div>
+  <div *ngIf="error">Error: {{ error }}</div>
+  <ul *ngIf="appointments.length">
+    <li *ngFor="let a of appointments">{{ a.id }} - resident: {{ a.residentId }} doctor: {{ a.doctorId }} date: {{ a.date }}</li>
+  </ul>
+</div>

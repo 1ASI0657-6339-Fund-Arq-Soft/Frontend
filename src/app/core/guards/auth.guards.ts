@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core"
+import { Injectable, inject } from "@angular/core"
 import { Router, type CanActivateFn } from "@angular/router"
 import { AuthService } from "../services/auth.service"
 
@@ -21,8 +21,8 @@ class AuthGuardService {
 }
 
 export const authGuard: CanActivateFn = (route, state) => {
-  const authService = new AuthService()
-  const router = new Router()
+  const authService = inject(AuthService)
+  const router = inject(Router)
   const guard = new AuthGuardService(authService, router)
   return guard.canActivate()
 }

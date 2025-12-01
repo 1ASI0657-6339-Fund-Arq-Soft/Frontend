@@ -48,17 +48,17 @@
       <div class="appointments-list">
         <div *ngFor="let apt of appointments" class="appointment-card">
           <div class="appointment-header">
-            <span class="appointment-type">{{ apt.title }}</span>
-            <span [class]="'status status-' + apt.status.toLowerCase()">{{ apt.status }}</span>
+            <span class="appointment-type">{{ apt.date }}</span>
+            <span [class]="'status status-' + (apt.status?.toLowerCase() || '')">{{ apt.status }}</span>
           </div>
           <div class="appointment-body">
             <p><strong>Fecha:</strong> {{ apt.date }}</p>
             <p><strong>Hora:</strong> {{ apt.time }}</p>
-            <p><strong>Doctor/Especialista:</strong> {{ apt.doctor }}</p>
+            <p><strong>Doctor/Especialista:</strong> {{ apt.doctorId }}</p>
           </div>
           <div class="appointment-actions">
             <button (click)="editAppointment(apt)" class="btn-edit">Editar</button>
-            <button (click)="cancelAppointment(apt.id)" class="btn-delete">Cancelar</button>
+            <button (click)="apt.id !== undefined && cancelAppointment(apt.id)" class="btn-delete">Cancelar</button>
           </div>
         </div>
       </div>

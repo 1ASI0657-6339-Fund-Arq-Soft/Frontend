@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject, Observable } from 'rxjs'
+import { NotificationApiService } from './notification-api.service'
+import { API_CONFIG } from '../config/api-config'
 import type { Notification } from '../models/notification.model'
+import type { NotificationDTO } from '../models/generated/notifications.types'
 
 @Injectable({ providedIn: 'root' })
 export class NotificationsService {
   private notificationsSubject = new BehaviorSubject<Notification[]>([])
   public notifications$ = this.notificationsSubject.asObservable()
 
-  constructor() {
+  constructor(private notificationApi: NotificationApiService) {
     this.loadFromStorage()
   }
 
@@ -22,9 +25,17 @@ export class NotificationsService {
       status: 'unread', // Default status for new notifications
       createdAt: new Date().toISOString(),
     }
+
     const current = [notif, ...this.notificationsSubject.value]
     this.notificationsSubject.next(current)
     this.saveToStorage(current)
+
+    // If backend available, try to create in remote notifications service as well (fire-and-forget)
+    if (API_CONFIG.useBackendServices) {
+      const dto: Partial<NotificationDTO> = { message: `${payload.title || ''} ${payload.description || ''}`.trim(), userId: payload.recipientId ?? undefined }
+      this.notificationApi.create(dto as any).subscribe({ next: (res) => console.debug('Notification created in backend', res), error: (e) => console.warn('Notifications API create failed:', e) })
+    }
+
     return notif
   }
 
@@ -36,6 +47,14 @@ export class NotificationsService {
     )
     this.notificationsSubject.next(updated)
     this.saveToStorage(updated)
+
+    if (API_CONFIG.useBackendServices) {
+      if (newStatus === 'read') {
+        this.notificationApi.markAsRead(notificationId).subscribe({ next: () => undefined, error: (e) => console.warn('Mark as read failed', e) })
+      } else if (newStatus === 'archived') {
+        this.notificationApi.archive(notificationId).subscribe({ next: () => undefined, error: (e) => console.warn('Archive failed', e) })
+      }
+    }
   }
 
   deleteNotification(notificationId: string): void {
@@ -44,6 +63,10 @@ export class NotificationsService {
     )
     this.notificationsSubject.next(remaining)
     this.saveToStorage(remaining)
+
+    if (API_CONFIG.useBackendServices) {
+      this.notificationApi.delete(notificationId).subscribe({ next: () => undefined, error: (e) => console.warn('Notification delete failed', e) })
+    }
   }
 
   markAsRead(notificationId: string): void {
@@ -56,6 +79,8 @@ export class NotificationsService {
     )
     this.notificationsSubject.next(remaining)
     this.saveToStorage(remaining)
+
+    // Backend doesn't expose bulk removal in OpenAPI, skip.
   }
 
   clearAll(): void {
@@ -76,47 +101,56 @@ export class NotificationsService {
   }
 
   private loadFromStorage() {
+    if (API_CONFIG.useBackendServices) {
+      this.notificationApi.getAll().subscribe({
+        next: (items) => {
+          this.setNotifications(items) // Use setNotifications to map DTOs and save to storage
+        },
+        error: (e) => {
+          console.warn('Failed to load notifications from backend, falling back to local storage/seed.', e)
+          this.loadLocalNotifications()
+        }
+      })
+    } else {
+      this.loadLocalNotifications()
+    }
+  }
+
+  private loadLocalNotifications() {
     try {
       const raw = localStorage.getItem('notifications')
       if (raw) {
         const parsed = JSON.parse(raw) as Notification[]
-        // Ensure all loaded notifications have a 'status' property
         const withStatus = parsed.map(n => ({
           ...n,
-          status: n.status || (n.read ? 'read' : 'unread') // Derive status from 'read' if not present
+          status: n.status || (n.read ? 'read' : 'unread')
         }));
         this.notificationsSubject.next(withStatus)
       } else {
-        // seed with example notifications to aid development / testing
-        const seed: Notification[] = [
-          {
-            id: this.generateId(),
-            title: 'Cita programada',
-            description: 'Tiene una cita programada para el 20 de Noviembre',
-            type: 'info',
-            date: new Date().toLocaleString(),
-            status: 'unread',
-            createdAt: new Date().toISOString(),
-            sender: 'Sistema',
-          },
-          {
-            id: this.generateId(),
-            title: 'Medicamento urgente',
-            description: 'Recordatorio: administrar medicamento a las 18:00',
-            type: 'urgent',
-            date: new Date().toLocaleString(),
-            status: 'unread',
-            createdAt: new Date().toISOString(),
-            sender: 'Cuidador',
-          },
-        ]
-        this.notificationsSubject.next(seed)
-        this.saveToStorage(seed)
+        // No local seed data. Prefer backend-only flows. If there is cached data in localStorage it would
+        // have been handled above; otherwise keep the list empty so UI shows no mock notifications.
+        this.notificationsSubject.next([])
       }
     } catch (e) {
-      console.error('Error loading notifications:', e)
+      console.error('Error loading local notifications:', e)
       this.notificationsSubject.next([])
     }
+  }
+
+  // Allow externally setting the full notifications list (e.g. from backend query)
+  public setNotifications(items: NotificationDTO[]) {
+    const mapped: Notification[] = items.map((i) => ({
+      id: i.id ?? this.generateId(),
+      title: 'Notification', // Default title
+      description: i.message || '', // Map DTO message to description
+      type: 'info', // Default type
+      date: i.createdAt ? new Date(i.createdAt).toLocaleString() : new Date().toLocaleString(), // Derive date from createdAt
+      recipientId: i.userId, // Map DTO userId to recipientId
+      status: (i.status as 'read' | 'unread' | 'archived') || 'unread', // Ensure status is a valid type
+      createdAt: i.createdAt,
+    }))
+    this.notificationsSubject.next(mapped)
+    this.saveToStorage(mapped)
   }
 
   private generateId(): string {

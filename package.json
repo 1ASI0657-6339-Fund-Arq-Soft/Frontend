@@ -6,7 +6,14 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "gen:openapi:residents": "openapi-typescript http://localhost:8081/v3/api-docs --output src/app/core/models/generated/residents.types.ts",
+    "gen:openapi:appointments": "openapi-typescript http://localhost:8085/v3/api-docs --output src/app/core/models/generated/appointments.types.ts",
+    "gen:openapi:users": "openapi-typescript http://localhost:8083/v3/api-docs --output src/app/core/models/generated/users.types.ts",
+    "gen:openapi:notifications": "openapi-typescript http://localhost:8084/v3/api-docs --output src/app/core/models/generated/notifications.types.ts",
+    "gen:openapi:payments": "openapi-typescript http://localhost:8082/v3/api-docs --output src/app/core/models/generated/payments.types.ts",
+    "gen:openapi:iam": "openapi-typescript http://localhost:8080/v3/api-docs --output src/app/core/models/generated/iam.types.ts",
+    "gen:openapi:all": "npm run gen:openapi:residents && npm run gen:openapi:appointments && npm run gen:openapi:users && npm run gen:openapi:notifications && npm run gen:openapi:payments && npm run gen:openapi:iam"
   },
   "prettier": {
     "printWidth": 100,
@@ -47,5 +54,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.9.2"
+    ,
+    "openapi-typescript": "^12.2.0"
   }
 }

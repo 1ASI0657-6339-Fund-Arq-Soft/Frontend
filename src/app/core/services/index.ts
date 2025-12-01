@@ -1,0 +1,6 @@
+export * from './iam-api.service'
+export * from './residents-api.service'
+export * from './appointment-api.service'
+export * from './users-api.service'
+export * from './notification-api.service'
+export * from './payment-api.service'

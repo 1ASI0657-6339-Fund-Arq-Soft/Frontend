@@ -2,15 +2,14 @@
     <div class="patients-container">
       <h1>Mis Pacientes</h1>
 
-      <div *ngIf="users.length === 0" class="no-patients">
+      <div *ngIf="residents.length === 0 && !loading" class="no-patients">
         No tienes pacientes asignados.
       </div>
-
-      <ul *ngIf="users.length > 0" class="patients-list">
-        <li *ngFor="let user of users" class="patient-card">
-          <h2>{{ user.name }}</h2>
-          <p><strong>Email:</strong> {{ user.email }}</p>
-          <p><strong>ID:</strong> {{ user.id }}</p>
+      <ul *ngIf="residents.length > 0" class="patients-list">
+        <li *ngFor="let r of residents" class="patient-card">
+          <h2>{{ r.firstName }} {{ r.lastName }}</h2>
+          <p><strong>DNI:</strong> {{ r.dni }}</p>
+          <p><strong>ID:</strong> {{ r.id }}</p>
         </li>
       </ul>
     </div>

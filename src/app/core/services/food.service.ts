@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, Observable, tap, catchError, throwError, map, of } from 'rxjs'
+import { HttpErrorResponse } from '@angular/common/http'
 import type { FoodEntry } from '../models/food.model'
+import { FoodApiService } from './food-api.service' // Import new API service
+import { API_CONFIG } from '../config/api-config' // Import API_CONFIG
 
 @Injectable({ providedIn: 'root' })
 export class FoodService {
   private entriesSubject = new BehaviorSubject<FoodEntry[]>([])
   public entries$ = this.entriesSubject.asObservable()
 
-  constructor() {
+  constructor(private foodApi: FoodApiService) { // Inject FoodApiService
     this.loadFromStorage()
   }
 
@@ -15,28 +18,53 @@ export class FoodService {
     return this.entriesSubject.value
   }
 
-  addEntry(payload: Omit<FoodEntry, 'id' | 'createdAt'>): FoodEntry {
-    const e: FoodEntry = {
-      id: this.generateId(),
-      ...payload,
-      createdAt: new Date().toISOString(),
-    }
-    const current = [e, ...this.entriesSubject.value]
-    this.entriesSubject.next(current)
-    this.saveToStorage(current)
-    return e
+  addEntry(payload: Omit<FoodEntry, 'id' | 'createdAt'>): Observable<FoodEntry> {
+    return this.foodApi.create(payload).pipe( // payload can be directly used as FoodEntry type
+        // On success, update local subject and cache
+        tap((entry) => {
+          const current = [entry, ...this.entriesSubject.value]
+          this.entriesSubject.next(current)
+          this.saveToStorage(current)
+        }),
+        catchError((e) => {
+          console.error('Failed to add food entry in backend.', e)
+          return throwError(() => e) // Re-throw the error after logging
+        })
+    )
   }
 
-  updateEntry(id: string, changes: Partial<FoodEntry>): void {
-    const updated = this.entriesSubject.value.map((e) => (e.id === id ? { ...e, ...changes } : e))
-    this.entriesSubject.next(updated)
-    this.saveToStorage(updated)
+  updateEntry(id: string, changes: Partial<FoodEntry>): Observable<FoodEntry> {
+    const currentEntry = this.entriesSubject.value.find(e => e.id === id)
+    if (!currentEntry) return throwError(() => new Error('Food entry not found'))
+
+    const updatedEntry: FoodEntry = { ...currentEntry, ...changes }
+
+      return this.foodApi.update(id, changes).pipe(
+        map((entry) => {
+        const updated = this.entriesSubject.value.map((e) => (e.id === id ? entry : e))
+        this.entriesSubject.next(updated)
+        this.saveToStorage(updated)
+        return entry
+      }),
+      catchError((e) => {
+        console.error('Failed to update food entry in backend.', e)
+        return throwError(() => e)
+      })
+    )
   }
 
-  deleteEntry(id: string): void {
-    const filtered = this.entriesSubject.value.filter((e) => e.id !== id)
-    this.entriesSubject.next(filtered)
-    this.saveToStorage(filtered)
+  deleteEntry(id: string): Observable<void> {
+    return this.foodApi.delete(id).pipe(
+      tap(() => {
+        const filtered = this.entriesSubject.value.filter((e) => e.id !== id)
+        this.entriesSubject.next(filtered)
+        this.saveToStorage(filtered)
+      }),
+      catchError((e) => {
+        console.error('Failed to delete food entry in backend.', e)
+        return throwError(() => e) // Re-throw the error after logging
+      })
+    )
   }
 
   clearAll(): void {
@@ -53,25 +81,26 @@ export class FoodService {
   }
 
   private loadFromStorage() {
+    this.foodApi.getAll().subscribe({
+      next: (entries) => {
+        this.entriesSubject.next(entries)
+        this.saveToStorage(entries) // Save fetched backend entries to local storage
+      },
+      error: (e: HttpErrorResponse) => {
+        console.warn('Failed to load food entries from backend, initializing with empty array.', e)
+        this.entriesSubject.next([]) // Initialize with empty array if backend fails
+      }
+    })
+  }
+
+  private loadLocalFoodEntries() {
     try {
       const raw = localStorage.getItem('foodEntries')
       if (raw) {
         const parsed = JSON.parse(raw) as FoodEntry[]
         this.entriesSubject.next(parsed)
       } else {
-        // seed example with user ids and date
-        const today = new Date()
-        const yyyy = today.getFullYear()
-        const mm = String(today.getMonth() + 1).padStart(2, '0')
-        const dd = String(today.getDate()).padStart(2, '0')
-        const dateStr = `${yyyy}-${mm}-${dd}`
-        const seed: FoodEntry[] = [
-          { id: this.generateId(), meal: 'breakfast', description: 'Avena con frutas', date: dateStr, time: '08:00', createdAt: new Date().toISOString(), addedBy: 'Cuidador', addedById: '2', targetId: '1' },
-          { id: this.generateId(), meal: 'lunch', description: 'Arroz con pollo', date: dateStr, time: '13:00', createdAt: new Date().toISOString(), addedBy: 'Cuidador', addedById: '2', targetId: '1' },
-          { id: this.generateId(), meal: 'dinner', description: 'Sopa de verduras', date: dateStr, time: '19:00', createdAt: new Date().toISOString(), addedBy: 'Cuidador', addedById: '2', targetId: '1' },
-        ]
-        this.entriesSubject.next(seed)
-        this.saveToStorage(seed)
+        this.entriesSubject.next([]) // Initialize with empty array, no local seed.
       }
     } catch (e) {
       console.error('Error loading food entries:', e)
@@ -79,7 +108,5 @@ export class FoodService {
     }
   }
 
-  private generateId(): string {
-    return 'food_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6)
-  }
+
 }

@@ -1,0 +1,13 @@
+<div class="residents-sample">
+  <h3>Residents sample</h3>
+  <div *ngIf="loading">Loading residents…</div>
+  <div *ngIf="error">Error: {{ error }}</div>
+  <ul *ngIf="residents.length">
+    <li *ngFor="let r of residents">{{ r.id }} - {{ r.firstName }} {{ r.lastName }} ({{ r.dni }})</li>
+  </ul>
+
+  <div style="margin-top: 12px;">
+    <input #dni placeholder="DNI to search" />
+    <button (click)="findByDni(dni.value)">Search by DNI</button>
+  </div>
+</div>

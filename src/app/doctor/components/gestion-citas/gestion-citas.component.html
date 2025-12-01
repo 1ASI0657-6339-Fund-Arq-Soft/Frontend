@@ -9,12 +9,17 @@
       [ngClass]="a.status"
     >
       <div class="card-info">
-        <h3 class="appointment-title">{{ a.title }}</h3>
+        <h3 class="appointment-title">Cita #{{ a.id }}</h3>
 
         <div class="appointment-time">
-          <span>{{ a.start }}</span>
+          <span>{{ a.date }}</span>
           <span class="separator">•</span>
-          <span>{{ a.end }}</span>
+          <span>{{ a.time?.hour || 0 }}:{{ a.time?.minute || '00' }}</span>
+        </div>
+
+        <div class="appointment-meta">
+          <div>Paciente: {{ residentsMap[a.residentId || 0] || a.residentId }}</div>
+          <div>Médico: {{ doctorsMap[a.doctorId || 0] || a.doctorId }}</div>
         </div>
 
         <div class="status" [ngClass]="a.status || 'pending'">

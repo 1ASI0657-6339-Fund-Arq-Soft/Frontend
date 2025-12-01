@@ -1,0 +1,10 @@
+<div class="receipts-viewer">
+  <h3>Receipts (from Payment API)</h3>
+  <div *ngIf="loading">Loading receipts…</div>
+  <div *ngIf="error">Error: {{ error }}</div>
+  <ul *ngIf="receipts.length">
+    <li *ngFor="let r of receipts">
+      <strong>#{{ r.receiptId }}</strong> — {{ r.type }} — {{ r.totalAmount }} — Resident: {{ r.residentId }} — Status: {{ r.status }}
+    </li>
+  </ul>
+</div>

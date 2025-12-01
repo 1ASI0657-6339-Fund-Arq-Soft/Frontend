@@ -9,19 +9,16 @@
       <div *ngFor="let c of (appointments$ | async)" class="cita-card">
 
         <div class="cita-info">
-          <h3 class="cita-title">{{ c.title }}</h3>
-          <p class="cita-meta">{{ c.start | date:'medium' }}</p>
-          <p class="cita-meta">{{ c.end | date:'medium' }}</p>
+          <h3 class="cita-title">Cita #{{ c.id }}</h3>
+          <p class="cita-meta">Fecha: {{ c.date }}</p>
+          <p class="cita-meta">Hora: {{ c.time?.hour || 0 }}:{{ c.time?.minute || '00' }}</p>
 
-          <p class="cita-specialty" *ngIf="c.specialty">
-            <strong>Especialidad:</strong> {{ c.specialty }}
+          <p class="cita-specialty" *ngIf="c.status">
+            <strong>Estado:</strong> {{ c.status }}
           </p>
 
-          <span class="cita-status"
-                [ngClass]="{ 'pendiente': c.status === 'pendiente',
-                             'finalizada': c.status === 'finalized'}">
-            {{ c.status || 'pendiente' }}
-          </span>
+          <p><strong>Paciente:</strong> {{ c.residentId }}</p>
+          <p><strong>Médico:</strong> {{ c.doctorId }}</p>
         </div>
 
         <div class="cita-actions">
@@ -41,20 +38,34 @@
 
         <form [formGroup]="appointmentForm" (ngSubmit)="saveAppointment()" class="modal-form">
 
-          <label>Título</label>
-          <input formControlName="title" class="form-input"/>
+          <label>Paciente (ID)</label>
+          <select formControlName="residentId" class="form-input">
+            <option value="">Seleccione residente</option>
+            <option *ngFor="let r of residents" [value]="r.id">{{ r.firstName }} {{ r.lastName }}</option>
+          </select>
 
-          <label>Inicio</label>
-          <input type="datetime-local" formControlName="start" class="form-input"/>
+          <label>Médico (ID)</label>
+          <select formControlName="doctorId" class="form-input">
+            <option value="">Seleccione médico</option>
+            <option *ngFor="let d of doctors" [value]="d.id">{{ d.fullName?.firstName }} {{ d.fullName?.lastName }}</option>
+          </select>
 
-          <label>Fin</label>
-          <input type="datetime-local" formControlName="end" class="form-input"/>
+          <label>Fecha</label>
+          <input type="date" formControlName="date" class="form-input"/>
 
-          <label>Especialidad</label>
-          <input formControlName="specialty" class="form-input"/>
+          <label>Hora - Hora</label>
+          <input type="number" min="0" max="23" formControlName="timeHour" class="form-input"/>
 
-          <label>Descripción</label>
-          <textarea formControlName="description" class="form-input"></textarea>
+          <label>Hora - Minuto</label>
+          <input type="number" min="0" max="59" formControlName="timeMinute" class="form-input"/>
+
+          <label>Estado</label>
+          <select formControlName="status" class="form-input">
+            <option value="pending">pending</option>
+            <option value="accepted">accepted</option>
+            <option value="rejected">rejected</option>
+            <option value="finalized">finalized</option>
+          </select>
 
           <div class="modal-actions">
             <button type="submit" class="btn-primary">Guardar</button>

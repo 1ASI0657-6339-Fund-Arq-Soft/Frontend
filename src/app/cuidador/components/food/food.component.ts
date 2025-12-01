@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms'
 import { LayoutComponent } from '../layout/layout.component'
 import { FoodService } from '../../../core/services/food.service'
 import { AuthService } from '../../../core/services/auth.service'
+import { UsersApiService } from '../../../core/services/users-api.service'
+import { API_CONFIG } from '../../../core/config/api-config'
 import type { FoodEntry, MealType } from '../../../core/models/food.model'
 import type { User } from '../../../core/models/user.model'
 import { Subscription } from 'rxjs'
@@ -26,7 +28,7 @@ export class FoodComponent implements OnInit, OnDestroy {
   selectedFamiliaId: string | null = null
   private sub: Subscription | null = null
 
-  constructor(private foodService: FoodService, private authService: AuthService) {
+  constructor(private foodService: FoodService, private authService: AuthService, private usersApi: UsersApiService) {
     // default date to today
     const today = new Date()
     const yyyy = today.getFullYear()
@@ -36,7 +38,7 @@ export class FoodComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.familiares = this.authService.getFamiliares()
+    this.usersApi.getAllFamilyMembers().subscribe({ next: (list) => (this.familiares = list as any), error: (e) => { console.warn('Failed to fetch family members', e); this.familiares = [] } })
     this.sub = this.foodService.entries$.subscribe((items) => {
       this.entries = items
       console.log('[Cuidador Food] entries', items)
@@ -56,10 +58,26 @@ export class FoodComponent implements OnInit, OnDestroy {
     if (!this.description || !this.time || !this.selectedFamiliaId || !this.date) return
     const currentUser = this.authService.getCurrentUser()
     if (this.editingId) {
-      this.foodService.updateEntry(this.editingId, { meal: this.meal, description: this.description, time: this.time, date: this.date, targetId: this.selectedFamiliaId })
+      this.foodService.updateEntry(this.editingId, { meal: this.meal, description: this.description, time: this.time, date: this.date, targetId: this.selectedFamiliaId }).subscribe({
+        next: (entry: FoodEntry) => {
+          // success — entries$ will be updated by the service, nothing else needed
+        },
+        error: (err: any) => {
+          console.error('Failed to update food entry', err)
+          alert('Error updating entry: ' + (err?.message ?? String(err)))
+        }
+      })
       this.editingId = null
     } else {
-      this.foodService.addEntry({ meal: this.meal, description: this.description, time: this.time, date: this.date, addedBy: currentUser?.name || 'Cuidador', addedById: currentUser?.id, targetId: this.selectedFamiliaId })
+      this.foodService.addEntry({ meal: this.meal, description: this.description, time: this.time, date: this.date, addedBy: currentUser?.name || 'Cuidador', addedById: currentUser?.id, targetId: this.selectedFamiliaId }).subscribe({
+        next: (entry: FoodEntry) => {
+          // created and pushed in service
+        },
+        error: (err: any) => {
+          console.error('Failed to create food entry', err)
+          alert('Error adding entry: ' + (err?.message ?? String(err)))
+        }
+      })
     }
     this.description = ''
     // reset date to today
@@ -73,7 +91,13 @@ export class FoodComponent implements OnInit, OnDestroy {
   }
 
   remove(id: string) {
-    this.foodService.deleteEntry(id)
+    this.foodService.deleteEntry(id).subscribe({
+      next: () => { /* entries$ updated by service */ },
+      error: (err: any) => {
+        console.error('Failed to delete food entry', err)
+        alert('Error deleting entry: ' + (err?.message ?? String(err)))
+      }
+    })
   }
 
   ngOnDestroy(): void {

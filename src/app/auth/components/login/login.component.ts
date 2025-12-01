@@ -3,6 +3,7 @@ import { CommonModule } from "@angular/common"
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from "@angular/forms"
 import { Router } from "@angular/router"
 import { AuthService } from "../../../core/services/auth.service"
+import { API_CONFIG } from '../../../core/config/api-config'
 
 
 @Component({
@@ -49,17 +50,26 @@ export class LoginComponent {
     }
 
     this.loading = true
+    const payload = { username: this.loginForm.value.email, password: this.loginForm.value.password }
+
+    // Use remote IAM if enabled in config
+    if (API_CONFIG.useRemoteAuth) {
+      this.authService.signInRemote(payload as any).subscribe({
+        next: (response) => {
+          const user = response.user
+          this.redirectByRole(user.role)
+        },
+        error: (error) => {
+          this.error = error?.message ?? "Error al iniciar sesión (IAM)"
+          this.loading = false
+        },
+      })
+      return
+    }
+
+    // fallback to local/mock auth
     this.authService.login(this.loginForm.value).subscribe({
-      next: (response) => {
-        const user = response.user
-        if (user.role === "familiar") {
-          this.router.navigate(["/familiar/dashboard"])
-        } else if (user.role === "cuidador") {
-          this.router.navigate(["/cuidador/dashboard"])
-        } else if (user.role === "doctor") {
-          this.router.navigate(["/doctor/gestion-citas"])
-        }
-      },
+      next: (response) => this.redirectByRole(response.user),
       error: (error) => {
         this.error = error.message || "Error al iniciar sesión"
         this.loading = false
@@ -79,6 +89,13 @@ export class LoginComponent {
       email: "cuidador@test.com",
       password: "password123",
     })
+  }
+
+  private redirectByRole(user: any) {
+    if (!user) return
+    if (user.role === 'familiar') this.router.navigate(['/familiar/dashboard'])
+    else if (user.role === 'cuidador') this.router.navigate(['/cuidador/dashboard'])
+    else if (user.role === 'doctor') this.router.navigate(['/doctor/gestion-citas'])
   }
 
   // Developer role removed
