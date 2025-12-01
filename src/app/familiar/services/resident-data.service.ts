@@ -56,6 +56,10 @@ export class ResidentDataService {
       console.warn('[ResidentDataService] No hay usuario actual, no se pueden cargar residentes');
       return;
     }
+    
+    console.log('[ResidentDataService] Usuario actual completo:', currentUser);
+    console.log('[ResidentDataService] familyMemberId:', currentUser.familyMemberId);
+    console.log('[ResidentDataService] linkedResidentId:', currentUser.linkedResidentId);
 
     // Obtener datos del familiar actual y sus residentes
     forkJoin({
@@ -64,115 +68,129 @@ export class ResidentDataService {
     }).subscribe({
       next: (data) => {
         console.log('[ResidentDataService] Datos cargados:', data);
+        console.log('[ResidentDataService] Usuario actual:', currentUser);
         
-        // Buscar el familiar actual basado en el ID del usuario
+        // Buscar el familiar actual usando familyMemberId del usuario
         const currentFamily = data.familyMembers.find(fm => 
-          fm.id?.toString() === currentUser.id
-        ) || data.familyMembers[0]; // Fallback al primer familiar si no encuentra match
+          fm.id?.toString() === currentUser.familyMemberId?.toString()
+        );
+        
+        console.log('[ResidentDataService] Familiar encontrado:', currentFamily);
 
-        if (currentFamily && data.residents.length > 0) {
-          // Crear perfiles combinando residentes con el familiar actual
-          const perfiles: PerfilCompleto[] = data.residents.map(resident => ({
-            residente: {
-              id: resident.id?.toString(),
-              nombre: `${resident.firstName || ''} ${resident.lastName || ''}`.trim(),
-              edad: 0, // ResidentResource no tiene age, usar 0 por defecto
-              condiciones: 'Sin condiciones registradas', // ResidentResource no tiene campos médicos
-              estadoGeneral: 'Estable', // Por defecto
-              ultimoChequeo: resident.birthDate || new Date().toISOString().split('T')[0] // Usar birthDate como referencia temporal
-            },
-            familiar: {
-              id: currentFamily.id?.toString(),
-              usuario: `${currentFamily.fullName?.firstName || ''} ${currentFamily.fullName?.lastName || ''}`.trim(),
-              correo: currentFamily.contactEmail?.phone || '', // Usar phone como email temporal
-              tipoUsuario: 'familiar',
-              residenteId: resident.id?.toString(),
-              telefono: currentFamily.contactEmail?.phone || '', // Usar contactEmail.phone
-              relacion: currentFamily.relationship || 'Familiar'
-            }
-          }));
-
-          this.perfilesSubject.next(perfiles);
+        if (currentFamily) {
+          // Filtrar solo el residente vinculado a este familiar
+          const linkedResident = data.residents.find(resident => 
+            resident.id?.toString() === currentFamily.linkedResidentId?.toString()
+          );
           
-          // Establecer el primer perfil como actual si no hay ninguno seleccionado
-          if (perfiles.length > 0 && !this.perfilActualSubject.value) {
+          console.log('[ResidentDataService] Residente vinculado encontrado:', linkedResident);
+          console.log('[ResidentDataService] Datos específicos del residente:');
+          console.log('- ID:', linkedResident?.id);
+          console.log('- Nombre:', linkedResident?.firstName, linkedResident?.lastName);
+          console.log('- Fecha nacimiento (original):', linkedResident?.birthDate);
+          console.log('- DNI:', linkedResident?.dni);
+          console.log('- Género:', linkedResident?.gender);
+          console.log('- Dirección:', linkedResident?.street, linkedResident?.city);
+          
+          if (linkedResident) {
+            // Crear perfil del residente vinculado
+            const perfiles: PerfilCompleto[] = [{
+              residente: {
+                id: linkedResident.id?.toString(),
+                nombre: `${linkedResident.firstName || ''} ${linkedResident.lastName || ''}`.trim(),
+                edad: this.calcularEdad(linkedResident.birthDate),
+                fechaNacimiento: linkedResident.birthDate,
+                condiciones: '',
+                estadoGeneral: '',
+                ultimoChequeo: ''
+              },
+              familiar: {
+                id: currentFamily.id?.toString(),
+                usuario: `${currentFamily.fullName?.firstName || ''} ${currentFamily.fullName?.lastName || ''}`.trim(),
+                correo: currentFamily.contactEmail?.phone || 'Sin correo registrado',
+                tipoUsuario: 'familiar',
+                residenteId: linkedResident.id?.toString(),
+                telefono: currentFamily.contactEmail?.phone || '',
+                relacion: currentFamily.relationship || 'Familiar'
+              }
+            }];
+            
+            this.perfilesSubject.next(perfiles);
             this.perfilActualSubject.next(perfiles[0]);
+            
+            console.log('[ResidentDataService] Perfil cargado exitosamente:', perfiles[0]);
+          } else {
+            console.warn('[ResidentDataService] No se encontró el residente vinculado al familiar');
+            this.perfilesSubject.next([]);
           }
+        } else {
+          console.warn('[ResidentDataService] No se encontró el familiar actual');
+          this.perfilesSubject.next([]);
         }
       },
       error: (error) => {
-        console.error('[ResidentDataService] Error al cargar datos reales:', error);
-        // Fallback a datos locales si existen
-        this.cargarDatosLocales();
+        console.error('[ResidentDataService] Error al cargar datos:', error);
+        this.perfilesSubject.next([]);
       }
     });
   }
-
-  private cargarDatosLocales(): void {
-    const datosGuardados = localStorage.getItem('perfiles_residentes');
-    if (datosGuardados) {
-      const perfiles = JSON.parse(datosGuardados);
-      this.perfilesSubject.next(perfiles);
+  
+  private calcularEdad(birthDate?: string): number {
+    console.log('[ResidentDataService] Calculando edad para fecha:', birthDate);
+    
+    if (!birthDate) {
+      console.warn('[ResidentDataService] No hay fecha de nacimiento, retornando 0');
+      return 0;
+    }
+    
+    try {
+      const hoy = new Date();
+      const nacimiento = new Date(birthDate);
+      
+      // Verificar si la fecha es válida
+      if (isNaN(nacimiento.getTime())) {
+        console.error('[ResidentDataService] Fecha de nacimiento inválida:', birthDate);
+        return 0;
+      }
+      
+      let edad = hoy.getFullYear() - nacimiento.getFullYear();
+      const mes = hoy.getMonth() - nacimiento.getMonth();
+      
+      if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+        edad--;
+      }
+      
+      console.log('[ResidentDataService] Edad calculada:', edad, 'años');
+      return Math.max(0, edad); // Asegurar que no sea negativa
+    } catch (error) {
+      console.error('[ResidentDataService] Error al calcular edad:', error);
+      return 0;
     }
   }
 
-  private guardarDatosLocales(): void {
-    localStorage.setItem('perfiles_residentes', JSON.stringify(this.perfilesSubject.value));
+  // Métodos públicos para gestionar perfiles
+  obtenerTodosPerfiles(): PerfilCompleto[] {
+    return this.perfilesSubject.value;
   }
 
-  crearPerfilDesdeRegistro(datosRegistro: any): string {
-    const nuevoId = this.generarId();
-
-    const residente: Residente = {
-      id: nuevoId,
-      nombre: datosRegistro.nombreResidente || '',
-      edad: datosRegistro.edadResidente || 0,
-      fechaNacimiento: datosRegistro.fechaNacimiento || '',
-      condiciones: datosRegistro.condiciones || '',
-      estadoGeneral: 'Estable',
-      ultimoChequeo: new Date().toISOString().split('T')[0]
-    };
-
-    const familiar: Familiar = {
-      id: this.generarId(),
-      usuario: datosRegistro.usuario || '',
-      correo: datosRegistro.correo || '',
-      tipoUsuario: datosRegistro.tipoUsuario || 'Familiar',
-      residenteId: nuevoId,
-      telefono: datosRegistro.telefono || '',
-      relacion: datosRegistro.relacion || 'Familiar'
-    };
-
-    const perfilCompleto: PerfilCompleto = { residente, familiar };
-
-    const perfilesActuales = this.perfilesSubject.value;
-    perfilesActuales.push(perfilCompleto);
-    this.perfilesSubject.next(perfilesActuales);
-    this.guardarDatosLocales();
-
-    return nuevoId;
-  }
-
-  obtenerPerfilPorId(id: string): PerfilCompleto | undefined {
-    return this.perfilesSubject.value.find(p => p.residente.id === id);
+  cambiarPerfilActual(perfil: PerfilCompleto): void {
+    this.perfilActualSubject.next(perfil);
   }
 
   establecerPerfilActual(id: string): void {
-    const perfil = this.obtenerPerfilPorId(id);
-    this.perfilActualSubject.next(perfil || null);
+    const perfil = this.perfilesSubject.value.find((p: any) => p.residente.id === id);
+    if (perfil) {
+      this.perfilActualSubject.next(perfil);
+    }
   }
 
   actualizarResidente(residente: Residente): void {
     const perfiles = this.perfilesSubject.value;
-    const index = perfiles.findIndex(p => p.residente.id === residente.id);
-
+    const index = perfiles.findIndex((p: any) => p.residente.id === residente.id);
     if (index !== -1) {
       perfiles[index].residente = residente;
       this.perfilesSubject.next(perfiles);
-      this.guardarDatosLocales();
-
-      const perfilActual = this.perfilActualSubject.value;
-      if (perfilActual && perfilActual.residente.id === residente.id) {
+      if (this.perfilActualSubject.value?.residente.id === residente.id) {
         this.perfilActualSubject.next(perfiles[index]);
       }
     }
@@ -180,33 +198,13 @@ export class ResidentDataService {
 
   actualizarFamiliar(familiar: Familiar): void {
     const perfiles = this.perfilesSubject.value;
-    const index = perfiles.findIndex(p => p.familiar.id === familiar.id);
-
+    const index = perfiles.findIndex((p: any) => p.familiar.id === familiar.id);
     if (index !== -1) {
       perfiles[index].familiar = familiar;
       this.perfilesSubject.next(perfiles);
-      this.guardarDatosLocales();
-
-      const perfilActual = this.perfilActualSubject.value;
-      if (perfilActual && perfilActual.familiar.id === familiar.id) {
+      if (this.perfilActualSubject.value?.familiar.id === familiar.id) {
         this.perfilActualSubject.next(perfiles[index]);
       }
     }
-  }
-  obtenerTodosPerfiles(): PerfilCompleto[] {
-    return this.perfilesSubject.value;
-  }
-
-  eliminarPerfil(id: string): void {
-    const perfiles = this.perfilesSubject.value.filter(p => p.residente.id !== id);
-    this.perfilesSubject.next(perfiles);
-    this.guardarDatosLocales();
-  }
-
-  private generarId(): string {
-    return 'res_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-  }
-  limpiarPerfilActual(): void {
-    this.perfilActualSubject.next(null);
   }
 }

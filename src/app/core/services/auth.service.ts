@@ -49,7 +49,7 @@ export class AuthService {
         console.log('Signin successful, fetching user details for ID:', authRes.id)
         // Get user details including roles
         return this.iam.getUsers().pipe(
-          map(users => {
+          switchMap(users => {
             const foundUser = users.find(u => u.id === authRes.id)
             if (!foundUser) {
               throw new Error('User details not found after signin')
@@ -62,16 +62,54 @@ export class AuthService {
             const safeRole = (['familiar', 'cuidador', 'doctor'].includes(rawRole)) ? 
               rawRole as User['role'] : 'familiar'
             
-            const user: User = { 
+            let user: User = { 
               id: String(authRes.id ?? ''), 
               email: authRes.username ?? '', 
               name: authRes.username ?? '', 
               role: safeRole 
             }
-            const auth: AuthResponse = { user, token: authRes.token ?? '' }
-            this.setCurrentUser(auth.user, auth.token)
-            console.log('Authentication complete:', { userId: user.id, role: user.role, hasToken: !!auth.token })
-            return auth
+            
+            // Si es familiar, buscar su familyMemberId y linkedResidentId
+            if (safeRole === 'familiar') {
+              console.log('[AuthService] Usuario familiar detectado, buscando datos adicionales...');
+              return this.usersApi.getAllFamilyMembers().pipe(
+                map(familyMembers => {
+                  // Buscar familiar por email (username)
+                  const familyMember = familyMembers.find(fm => 
+                    fm.contactEmail?.phone === authRes.username ||
+                    fm.fullName?.firstName?.toLowerCase().includes(authRes.username?.toLowerCase() || '') ||
+                    fm.fullName?.lastName?.toLowerCase().includes(authRes.username?.toLowerCase() || '')
+                  );
+                  
+                  if (familyMember) {
+                    console.log('[AuthService] Familiar encontrado:', familyMember);
+                    user.familyMemberId = familyMember.id;
+                    user.linkedResidentId = familyMember.linkedResidentId;
+                    user.name = `${familyMember.fullName?.firstName || ''} ${familyMember.fullName?.lastName || ''}`.trim();
+                  } else {
+                    console.warn('[AuthService] No se encontró el familiar en el microservicio de usuarios');
+                  }
+                  
+                  const auth: AuthResponse = { user, token: authRes.token ?? '' };
+                  this.setCurrentUser(auth.user, auth.token);
+                  console.log('Authentication complete:', { userId: user.id, role: user.role, hasToken: !!auth.token, familyMemberId: user.familyMemberId });
+                  return auth;
+                }),
+                catchError(error => {
+                  console.error('[AuthService] Error al buscar datos del familiar:', error);
+                  // Continuar con usuario básico si falla
+                  const auth: AuthResponse = { user, token: authRes.token ?? '' };
+                  this.setCurrentUser(auth.user, auth.token);
+                  return of(auth);
+                })
+              );
+            } else {
+              // Para otros roles, continuar normalmente
+              const auth: AuthResponse = { user, token: authRes.token ?? '' }
+              this.setCurrentUser(auth.user, auth.token)
+              console.log('Authentication complete:', { userId: user.id, role: user.role, hasToken: !!auth.token })
+              return of(auth);
+            }
           })
         )
       }),
