@@ -102,41 +102,23 @@ export class RegisterComponent {
 
     const { confirmPassword, ...registerData } = this.registerForm.value;
 
+    console.log('Attempting to register with data:', registerData);
+    
     this.authService.register(registerData).subscribe({
       next: (response) => {
-        const user = response.user;
-
-        if (user.role === "familiar") {
-          const datosRegistro = {
-            usuario: registerData.name,
-            correo: registerData.email,
-            tipoUsuario: 'Familiar',
-            telefono: registerData.phone || '',
-            relacion: registerData.relationship || 'Familiar',
-
-            nombreResidente: registerData.residentName,
-            edadResidente: registerData.residentAge,
-            fechaNacimiento: registerData.residentBirthDate || '',
-            condiciones: registerData.residentCondition || ''
-          };
-
-          const residenteId = this.residentDataService.crearPerfilDesdeRegistro(datosRegistro);
-          this.residentDataService.establecerPerfilActual(residenteId);
-
-          console.log('Perfil del residente creado con ID:', residenteId);
-        }
-
-        if (user.role === "familiar") {
-          this.router.navigate(["/familiar/dashboard"]);
-        } else if (user.role === "cuidador") {
-          this.router.navigate(["/cuidador/dashboard"]);
-        } else if (user.role === "doctor") {
-          this.router.navigate(["/doctor/gestion-citas"]);
-        }
-
+        console.log('Registration successful:', response);
         this.loading = false;
+        
+        // Registro exitoso, redirigir al login
+        this.router.navigate(["/login"], { 
+          queryParams: { 
+            registered: 'true', 
+            email: registerData.email 
+          } 
+        });
       },
       error: (error) => {
+        console.error('Registration failed:', error);
         this.error = error.message || "Error al registrarse";
         this.loading = false;
       },

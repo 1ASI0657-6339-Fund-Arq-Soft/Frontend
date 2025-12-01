@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core"
-import { BehaviorSubject, Observable } from "rxjs"
-import { map, switchMap } from 'rxjs/operators'
+import { BehaviorSubject, Observable, throwError } from "rxjs"
+import { map, switchMap, catchError } from 'rxjs/operators'
 import type { User, AuthResponse, LoginRequest, RegisterRequest } from "../models/user.model"
 import { IamApiService } from './iam-api.service'
 import type { AuthenticatedUserResource, SignInResource, SignUpResource } from '../models/generated/iam.types'
@@ -36,36 +36,74 @@ export class AuthService {
 
   // Use remote IAM service to sign-in (returns token from backend)
   signInRemote(request: SignInResource): Observable<AuthResponse> {
+    console.log('AuthService.signInRemote called with:', request)
+    console.log('Using direct IAM signin + user lookup for roles')
     return this.iam.signIn(request).pipe(
-      map((res: AuthenticatedUserResource) => {
-        const user: User = { id: String(res.id ?? ''), email: res.username ?? '', name: res.username ?? '', role: 'familiar' }
-        const auth: AuthResponse = { user, token: res.token ?? '' }
-        this.setCurrentUser(auth.user, auth.token)
-        return auth
+      switchMap((authRes: AuthenticatedUserResource) => {
+        console.log('Signin successful, fetching user details for ID:', authRes.id)
+        // Get user details including roles
+        return this.iam.getUsers().pipe(
+          map(users => {
+            const foundUser = users.find(u => u.id === authRes.id)
+            if (!foundUser) {
+              throw new Error('User details not found after signin')
+            }
+            
+            // Extract role from user data
+            const rawRole = (foundUser.roles && foundUser.roles.length > 0) ? 
+              foundUser.roles[0].replace('ROLE_', '').toLowerCase() : 'familiar'
+            
+            const safeRole = (['familiar', 'cuidador', 'doctor'].includes(rawRole)) ? 
+              rawRole as User['role'] : 'familiar'
+            
+            const user: User = { 
+              id: String(authRes.id ?? ''), 
+              email: authRes.username ?? '', 
+              name: authRes.username ?? '', 
+              role: safeRole 
+            }
+            const auth: AuthResponse = { user, token: authRes.token ?? '' }
+            this.setCurrentUser(auth.user, auth.token)
+            console.log('Authentication complete:', { userId: user.id, role: user.role, hasToken: !!auth.token })
+            return auth
+          })
+        )
+      }),
+      catchError((error) => {
+        console.error('SignIn process failed:', error)
+        return throwError(() => error)
       })
     )
   }
 
   signUpRemote(request: SignUpResource): Observable<AuthResponse> {
-    // Create the user then sign-in to obtain token
+    // Create user then auto-signin to get token (backend now works correctly)
     return this.iam.signUp(request).pipe(
-      switchMap(() => this.iam.signIn({ username: request.username || '', password: request.password || '' })),
-      map((res: AuthenticatedUserResource) => {
-        const user: User = { id: String(res.id ?? ''), email: res.username ?? '', name: res.username ?? '', role: 'familiar' }
-        const auth: AuthResponse = { user, token: res.token ?? '' }
-        this.setCurrentUser(auth.user, auth.token)
-        return auth
-      })
+      switchMap(() => this.signInRemote({ username: request.username || '', password: request.password || '' }))
     )
   }
 
   register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.iam.signUp({ username: request.email, password: request.password }).pipe(
-      switchMap(() => this.iam.signIn({ username: request.email, password: request.password })),
-      map((res: AuthenticatedUserResource) => {
-        const user: User = { id: String(res.id ?? ''), email: res.username ?? '', name: res.username ?? '', role: request.role }
-        const auth: AuthResponse = { user, token: res.token ?? '' }
-        this.setCurrentUser(auth.user, auth.token)
+    const roleMapping = {
+      'familiar': 'ROLE_FAMILIAR',
+      'cuidador': 'ROLE_CUIDADOR',
+      'doctor': 'ROLE_DOCTOR'
+    }
+    
+    return this.iam.signUp({ 
+      username: request.email, 
+      password: request.password,
+      roles: [roleMapping[request.role as keyof typeof roleMapping]]
+    }).pipe(
+      map((userResource) => {
+        console.log('Registration successful:', userResource)
+        const user: User = { 
+          id: String(userResource.id ?? ''), 
+          email: userResource.username ?? '', 
+          name: userResource.username ?? '', 
+          role: request.role 
+        }
+        const auth: AuthResponse = { user, token: '' }
         return auth
       })
     )
@@ -133,4 +171,6 @@ export class AuthService {
       map(users => users.filter(u => u.role === 'familiar'))
     )
   }
+
+
 }

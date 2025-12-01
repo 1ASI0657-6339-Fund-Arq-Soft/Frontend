@@ -17,6 +17,10 @@
         <h2>Iniciar sesión</h2>
         <p class="form-subtitle">Acceda a su cuenta de usuario</p>
 
+        <div *ngIf="successMessage" class="alert alert-success">
+          {{ successMessage }}
+        </div>
+
         <div *ngIf="error" class="alert alert-error">
           {{ error }}
         </div>
@@ -86,7 +90,7 @@
         </div>
 
         <div class="register-link">
-          <a href="/register">Registrate</a>
+          <a routerLink="/register">Registrate</a>
         </div>
       </div>
     </div>
