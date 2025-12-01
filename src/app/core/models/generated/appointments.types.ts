@@ -12,7 +12,7 @@ export interface AppointmentResource {
   residentId?: number
   doctorId?: number
   date?: string // date
-  time?: LocalTime
+  time?: string // Format: "HH:mm:ss"
   status?: string
 }
 
@@ -20,6 +20,6 @@ export interface CreateAppointmentResource {
   residentId?: number
   doctorId?: number
   date?: string
-  time?: LocalTime
+  time?: string // Format: "HH:mm:ss"
   status?: string
 }

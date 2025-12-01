@@ -7,7 +7,7 @@ import { AuthService } from '../../../core/services/auth.service'
 import { UsersApiService } from '../../../core/services/users-api.service'
 import { API_CONFIG } from '../../../core/config/api-config'
 import type { FoodEntry, MealType } from '../../../core/models/food.model'
-import type { User } from '../../../core/models/user.model'
+import type { FamilyMemberResource } from '../../../core/models/generated/users.types'
 import { Subscription } from 'rxjs'
 
 @Component({
@@ -19,8 +19,8 @@ import { Subscription } from 'rxjs'
 })
 export class FoodComponent implements OnInit, OnDestroy {
   entries: FoodEntry[] = []
-  familiares: User[] = []
-  meal: MealType = 'breakfast'
+  familiares: FamilyMemberResource[] = []
+  meal: MealType = 'BREAKFAST'
   description = ''
   date = ''
   time = ''
@@ -38,7 +38,24 @@ export class FoodComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.usersApi.getAllFamilyMembers().subscribe({ next: (list) => (this.familiares = list as any), error: (e) => { console.warn('Failed to fetch family members', e); this.familiares = [] } })
+    console.log('[Cuidador Food] Cargando familiares desde microservicio...');
+    console.log('[Cuidador Food] URL que se va a llamar: GET /api/v1/family-members');
+    this.usersApi.getAllFamilyMembers().subscribe({ 
+      next: (list) => {
+        console.log('[Cuidador Food] ✅ Familiares cargados exitosamente:', list);
+        console.log('[Cuidador Food] Cantidad de familiares:', list.length);
+        this.familiares = list;
+        
+        if (list.length === 0) {
+          console.warn('[Cuidador Food] ⚠️ No se encontraron familiares en el microservicio');
+        }
+      }, 
+      error: (e) => { 
+        console.error('[Cuidador Food] ❌ Error al cargar familiares:', e); 
+        console.error('[Cuidador Food] Error completo:', JSON.stringify(e, null, 2));
+        this.familiares = []; 
+      } 
+    });
     this.sub = this.foodService.entries$.subscribe((items) => {
       this.entries = items
       console.log('[Cuidador Food] entries', items)
@@ -98,6 +115,26 @@ export class FoodComponent implements OnInit, OnDestroy {
         alert('Error deleting entry: ' + (err?.message ?? String(err)))
       }
     })
+  }
+
+  getFamiliarName(id: string): string {
+    const familiar = this.familiares.find(f => f.id?.toString() === id);
+    if (!familiar) return 'Familiar no encontrado';
+    
+    const firstName = familiar.fullName?.firstName || '';
+    const lastName = familiar.fullName?.lastName || '';
+    const relationship = familiar.relationship || 'Familiar';
+    
+    return `${firstName} ${lastName} (${relationship})`.trim();
+  }
+
+  getMealDisplayName(meal: MealType): string {
+    const mealNames: Record<MealType, string> = {
+      'BREAKFAST': 'Desayuno',
+      'LUNCH': 'Almuerzo', 
+      'DINNER': 'Cena'
+    };
+    return mealNames[meal] || meal;
   }
 
   ngOnDestroy(): void {

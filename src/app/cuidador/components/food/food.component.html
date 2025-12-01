@@ -8,14 +8,17 @@
       <label>Destinatario</label>
       <select [(ngModel)]="selectedFamiliaId">
         <option [value]="null">Seleccione un familiar</option>
-        <option *ngFor="let f of familiares" [value]="f.id">{{ f.name }}</option>
+        <option *ngFor="let f of familiares" [value]="f.id">
+          {{ (f.fullName?.firstName || '') + ' ' + (f.fullName?.lastName || '') }} 
+          ({{ f.relationship || 'Familiar' }})
+        </option>
       </select>
 
       <label>Comida</label>
       <select [(ngModel)]="meal">
-        <option value="breakfast">Desayuno</option>
-        <option value="lunch">Almuerzo</option>
-        <option value="dinner">Cena</option>
+        <option value="BREAKFAST">Desayuno</option>
+        <option value="LUNCH">Almuerzo</option>
+        <option value="DINNER">Cena</option>
       </select>
 
       <label>Descripción</label>
@@ -41,23 +44,30 @@
     <div class="entries">
       <h3 class="section-title">Historial de alimentos</h3>
 
-      <div *ngFor="let e of entries" class="card entry">
-        <div class="entry-left">
-          <div class="entry-meal">{{ e.meal | titlecase }}</div>
-          <div class="entry-desc">{{ e.description }}</div>
-        </div>
-
-        <div class="entry-right">
-          <div class="entry-datetime">
-            {{ e.date }} • <span>{{ e.time }}</span>
+      @for (e of entries; track e.id) {
+        <div class="card entry">
+          <div class="entry-left">
+            <div class="entry-meal">{{ getMealDisplayName(e.meal) }}</div>
+            <div class="entry-desc">{{ e.description }}</div>
+            @if (e.targetId) {
+              <div class="entry-target">
+                <strong>Para:</strong> {{ getFamiliarName(e.targetId) }}
+              </div>
+            }
           </div>
 
-          <div class="entry-actions">
-            <button class="btn btn-small" (click)="startEdit(e)">Editar</button>
-            <button class="btn btn-danger btn-small" (click)="remove(e.id)">Eliminar</button>
+          <div class="entry-right">
+            <div class="entry-datetime">
+              {{ e.date }} • <span>{{ e.time }}</span>
+            </div>
+
+            <div class="entry-actions">
+              <button class="btn btn-small" (click)="startEdit(e)">Editar</button>
+              <button class="btn btn-danger btn-small" (click)="remove(e.id)">Eliminar</button>
+            </div>
           </div>
         </div>
-      </div>
+      }
     </div>
   </div>
 </app-cuidador-layout>

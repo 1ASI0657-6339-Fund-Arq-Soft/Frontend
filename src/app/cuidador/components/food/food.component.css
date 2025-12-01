@@ -81,6 +81,16 @@
   color: #374151;
 }
 
+.entry-target {
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.entry-target strong {
+  color: #374151;
+}
+
 .entry-right {
   text-align: right;
 }

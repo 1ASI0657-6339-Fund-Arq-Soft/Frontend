@@ -11,14 +11,14 @@
         <div class="cita-info">
           <h3 class="cita-title">Cita #{{ c.id }}</h3>
           <p class="cita-meta">Fecha: {{ c.date }}</p>
-          <p class="cita-meta">Hora: {{ c.time?.hour || 0 }}:{{ c.time?.minute || '00' }}</p>
+          <p class="cita-meta">Hora: {{ c.time }}</p>
 
           <p class="cita-specialty" *ngIf="c.status">
             <strong>Estado:</strong> {{ c.status }}
           </p>
 
-          <p><strong>Paciente:</strong> {{ c.residentId }}</p>
-          <p><strong>Médico:</strong> {{ c.doctorId }}</p>
+          <p><strong>Paciente:</strong> {{ getResidentName(c.residentId) }}</p>
+          <p><strong>Médico:</strong> {{ getDoctorName(c.doctorId) }}</p>
         </div>
 
         <div class="cita-actions">
@@ -53,11 +53,11 @@
           <label>Fecha</label>
           <input type="date" formControlName="date" class="form-input"/>
 
-          <label>Hora - Hora</label>
-          <input type="number" min="0" max="23" formControlName="timeHour" class="form-input"/>
+          <label>Hora - Hora (0-23)</label>
+          <input type="number" min="0" max="23" placeholder="9" formControlName="timeHour" class="form-input"/>
 
-          <label>Hora - Minuto</label>
-          <input type="number" min="0" max="59" formControlName="timeMinute" class="form-input"/>
+          <label>Hora - Minuto (0-59)</label>
+          <input type="number" min="0" max="59" placeholder="0" formControlName="timeMinute" class="form-input"/>
 
           <label>Estado</label>
           <select formControlName="status" class="form-input">

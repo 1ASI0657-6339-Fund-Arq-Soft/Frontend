@@ -34,10 +34,15 @@ export class PaymentsComponent implements OnInit, OnDestroy {
   private sub: Subscription | null = null
 
   private mapFamilyMemberResourceToUser(fm: FamilyMemberResource): User {
+    const firstName = fm.fullName?.firstName ?? '';
+    const lastName = fm.fullName?.lastName ?? '';
+    const fullName = `${firstName} ${lastName}`.trim();
+    const relationship = fm.relationship ?? 'Familiar';
+    
     return {
       id: String(fm.id ?? ''),
-      email: fm.contactEmail?.address?.street ?? '', // Placeholder, as email is not directly available
-      name: `${fm.fullName?.firstName ?? ''} ${fm.fullName?.lastName ?? ''}`.trim(),
+      email: fm.contactEmail?.phone ?? '', // Usar phone como email placeholder temporalmente
+      name: fullName ? `${fullName} (${relationship})` : `ID: ${fm.id} (${relationship})`,
       role: 'familiar',
     }
   }
@@ -51,13 +56,30 @@ export class PaymentsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    console.log('[Payments Component] 🚀 Inicializando, cargando familiares...');
+    console.log('[Payments Component] URL: GET /api/v1/family-members');
     this.loadingFamiliares = true
     this.usersApi.getAllFamilyMembers().subscribe({
       next: (list) => {
+        console.log('[Payments Component] ✅ Familiares raw del microservicio:', list);
+        console.log('[Payments Component] Cantidad recibida:', list.length);
         this.familiares = list.map(fm => this.mapFamilyMemberResourceToUser(fm))
+        console.log('[Payments Component] ✅ Familiares mapeados:', this.familiares);
         this.loadingFamiliares = false
+        
+        if (this.familiares.length === 0) {
+          console.warn('[Payments Component] ⚠️ No hay familiares disponibles');
+        }
       },
-      error: (e) => { this.backendErrorFamiliares = e?.message ?? 'Failed to load family members'; this.loadingFamiliares = false; this.familiares = [] }
+      error: (e) => { 
+        console.error('[Payments Component] ❌ Error detallado al cargar familiares:', e);
+        console.error('[Payments Component] Status:', e.status);
+        console.error('[Payments Component] Message:', e.message);
+        console.error('[Payments Component] URL:', e.url);
+        this.backendErrorFamiliares = e?.message ?? 'Failed to load family members'; 
+        this.loadingFamiliares = false; 
+        this.familiares = [] 
+      }
     })
     this.sub = this.paymentsService.payments$.subscribe((items) => {
       this.payments = items

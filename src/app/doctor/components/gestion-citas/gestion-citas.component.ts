@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { AppointmentApiService } from '../../../core/services/appointment-api.service';
-import { Observable } from 'rxjs';
+import { Observable, take, map } from 'rxjs';
 import type { AppointmentResource } from '../../../core/models/generated/appointments.types';
 import { ResidentsApiService } from '../../../core/services/residents-api.service';
 import { UsersApiService } from '../../../core/services/users-api.service';
@@ -35,12 +35,32 @@ export class GestionCitasComponent implements OnInit {
 
   accept(id: number | undefined) {
     if (!id) return;
-    // fetch full appointment, update status and PUT
-    this.appointmentApi.getById(id).subscribe((a) => {
-      if (!a) return
-      const payload = { ...a, status: 'accepted' }
-      this.appointmentApi.update(id, payload).subscribe(() => { this.appointments$ = this.appointmentApi.getAll() })
-    })
+    
+    console.log(`[GestionCitasComponent] Aceptando cita con ID: ${id}`);
+    
+    // Find the appointment in the current list
+    this.appointments$.pipe(
+      take(1),
+      map(appointments => appointments.find(a => a.id === id))
+    ).subscribe(appointment => {
+      if (!appointment) {
+        console.error(`[GestionCitasComponent] No se encontró la cita con ID: ${id}`);
+        return;
+      }
+      
+      const payload = { ...appointment, status: 'accepted' };
+      console.log(`[GestionCitasComponent] Actualizando cita:`, payload);
+      
+      this.appointmentApi.update(id, payload).subscribe({
+        next: () => {
+          console.log(`[GestionCitasComponent] Cita ${id} aceptada exitosamente`);
+          this.appointments$ = this.appointmentApi.getAll();
+        },
+        error: (error) => {
+          console.error(`[GestionCitasComponent] Error al aceptar cita ${id}:`, error);
+        }
+      });
+    });
   }
 
   reject(id: number | undefined) {

@@ -17,7 +17,7 @@ import { FormsModule } from '@angular/forms'
 export class FoodComponent implements OnInit, OnDestroy {
   entries: FoodEntry[] = []
   allEntries: FoodEntry[] = []
-  grouped: Record<MealType, FoodEntry[]> = { breakfast: [], lunch: [], dinner: [] }
+  grouped: Record<MealType, FoodEntry[]> = { BREAKFAST: [], LUNCH: [], DINNER: [] }
   private sub: Subscription | null = null
 
   startDate: string = ''
@@ -35,7 +35,7 @@ export class FoodComponent implements OnInit, OnDestroy {
       } else {
         this.entries = []
         this.allEntries = []
-        this.grouped = { breakfast: [], lunch: [], dinner: [] }
+        this.grouped = { BREAKFAST: [], LUNCH: [], DINNER: [] }
       }
     })
   }
@@ -49,7 +49,7 @@ export class FoodComponent implements OnInit, OnDestroy {
       filtered = filtered.filter((e) => new Date(e.date) <= new Date(this.endDate))
     }
     this.entries = filtered
-    this.grouped = { breakfast: [], lunch: [], dinner: [] }
+    this.grouped = { BREAKFAST: [], LUNCH: [], DINNER: [] }
     for (const e of this.entries) {
       this.grouped[e.meal].push(e)
     }
@@ -59,6 +59,15 @@ export class FoodComponent implements OnInit, OnDestroy {
     this.startDate = ''
     this.endDate = ''
     this.applyFilter()
+  }
+
+  getMealDisplayName(meal: MealType): string {
+    const mealNames: Record<MealType, string> = {
+      'BREAKFAST': 'Desayuno',
+      'LUNCH': 'Almuerzo', 
+      'DINNER': 'Cena'
+    };
+    return mealNames[meal] || meal;
   }
 
   ngOnDestroy(): void {

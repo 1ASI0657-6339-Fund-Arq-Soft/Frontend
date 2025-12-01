@@ -2,7 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LayoutComponent } from '../layout/layout.component';
 import { ResidentDataService, PerfilCompleto } from '../../services/resident-data.service';
-import { Subscription } from 'rxjs';
+import { AppointmentApiService } from '../../../core/services/appointment-api.service';
+import { NotificationApiService } from '../../../core/services/notification-api.service';
+import { PaymentApiService } from '../../../core/services/payment-api.service';
+import { Subscription, forkJoin } from 'rxjs';
+import { AuthService } from '../../../core/services/auth.service';
+import type { AppointmentResource } from '../../../core/models/generated/appointments.types';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,32 +19,27 @@ import { Subscription } from 'rxjs';
 export class DashboardComponent implements OnInit, OnDestroy {
   perfilActual: PerfilCompleto | null = null;
 
-  proximasCitas = [
-    {
-      fecha: '01-15',
-      tipo: 'Consulta Médica',
-      profesional: 'Dr. Juan Pérez',
-      hora: '10:00 AM'
-    },
-    {
-      fecha: '01-18',
-      tipo: 'Terapia Física',
-      profesional: 'Lic. María González',
-      hora: '2:00 PM'
-    }
-  ];
+  proximasCitas: any[] = [];
 
   estadisticas = {
-    proximasCitas: 3,
-    notificaciones: 7,
-    paginasPendientes: 1
+    proximasCitas: 0,
+    notificaciones: 0,
+    paginasPendientes: 0
   };
 
   private subscription = new Subscription();
 
-  constructor(private residentDataService: ResidentDataService) {}
+  constructor(
+    private residentDataService: ResidentDataService,
+    private appointmentApi: AppointmentApiService,
+    private notificationApi: NotificationApiService,
+    private paymentApi: PaymentApiService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+    console.log('[Dashboard Familiar] Inicializando con datos reales de microservicios');
+    
     this.subscription.add(
       this.residentDataService.perfilActual$.subscribe(perfil => {
         this.perfilActual = perfil;
@@ -50,8 +50,86 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.residentDataService.establecerPerfilActual(perfiles[0].residente.id!);
           }
         }
+        
+        // Cargar datos reales cuando se selecciona un perfil
+        if (perfil) {
+          this.loadRealData();
+        }
       })
     );
+
+    // Cargar datos iniciales
+    this.loadRealData();
+  }
+
+  private loadRealData(): void {
+    console.log('[Dashboard Familiar] Cargando datos reales de microservicios');
+    
+    // Obtener datos en paralelo de todos los microservicios
+    forkJoin({
+      appointments: this.appointmentApi.getAll(),
+      notifications: this.notificationApi.getAll(),
+      payments: this.paymentApi.getAll()
+    }).subscribe({
+      next: (data) => {
+        console.log('[Dashboard Familiar] Datos cargados:', data);
+        
+        // Procesar citas próximas
+        this.processAppointments(data.appointments);
+        
+        // Actualizar estadísticas
+        this.estadisticas = {
+          proximasCitas: this.proximasCitas.length,
+          notificaciones: data.notifications?.length || 0,
+          paginasPendientes: data.payments?.filter(p => !p.status).length || 0
+        };
+      },
+      error: (error) => {
+        console.error('[Dashboard Familiar] Error al cargar datos:', error);
+        // Mantener valores por defecto en caso de error
+        this.estadisticas = {
+          proximasCitas: 0,
+          notificaciones: 0,
+          paginasPendientes: 0
+        };
+      }
+    });
+  }
+
+  private processAppointments(appointments: AppointmentResource[]): void {
+    // Filtrar y formatear las próximas citas
+    const now = new Date();
+    const upcomingAppointments = appointments
+      .filter(apt => {
+        if (!apt.date) return false;
+        const aptDate = new Date(apt.date);
+        return aptDate >= now; // Solo citas futuras
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.date!);
+        const dateB = new Date(b.date!);
+        return dateA.getTime() - dateB.getTime();
+      })
+      .slice(0, 3); // Solo las próximas 3
+
+    this.proximasCitas = upcomingAppointments.map(apt => ({
+      fecha: this.formatAppointmentDate(apt.date!),
+      tipo: 'Consulta Médica', // Por defecto, se podría agregar campo tipo en el backend
+      profesional: `Doctor ID: ${apt.doctorId}`, // Se podría hacer join con users service
+      hora: this.formatAppointmentTime(apt.time)
+    }));
+  }
+
+  private formatAppointmentDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+  }
+
+  private formatAppointmentTime(time: any): string {
+    if (!time) return '00:00';
+    const hour = time.hour?.toString().padStart(2, '0') || '00';
+    const minute = time.minute?.toString().padStart(2, '0') || '00';
+    return `${hour}:${minute}`;
   }
 
   ngOnDestroy(): void {

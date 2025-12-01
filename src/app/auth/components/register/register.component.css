@@ -121,6 +121,24 @@
   border-radius: 2px;
 }
 
+.subsection-title {
+  font-size: 1.1rem;
+  color: #475569;
+  margin: 2rem 0 1rem 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.subsection-title::before {
+  content: '';
+  width: 3px;
+  height: 20px;
+  background: #6b7280;
+  border-radius: 2px;
+}
+
 .form-group {
   margin-bottom: 1.5rem;
 }

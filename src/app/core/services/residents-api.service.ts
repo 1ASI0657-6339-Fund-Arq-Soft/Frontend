@@ -64,6 +64,18 @@ export class ResidentsApiService {
 
   create(payload: CreateResidentResource): Observable<ResidentResource> {
     console.log('[ResidentsApiService] Creando nuevo residente:', payload);
+    console.log('[ResidentsApiService] 📊 Detalle del payload:');
+    console.log('  - dni:', payload.dni);
+    console.log('  - firstName:', payload.firstName);
+    console.log('  - lastName:', payload.lastName);
+    console.log('  - street:', payload.street);
+    console.log('  - city:', payload.city);
+    console.log('  - state:', payload.state);
+    console.log('  - country:', payload.country);
+    console.log('  - zipCode:', payload.zipCode);
+    console.log('  - birthDate:', payload.birthDate);
+    console.log('  - gender:', payload.gender);
+    console.log('  - receiptId:', payload.receiptId);
     return this.http.post<ResidentResource>(this.baseUrl, payload, this.getHttpOptions()).pipe(
       tap(newResident => {
         console.log('[ResidentsApiService] Residente creado exitosamente:', newResident);
