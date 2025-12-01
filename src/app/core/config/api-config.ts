@@ -1,4 +1,5 @@
 export const API_CONFIG = {
+  BASE_URL: '/api/v1',
   residentsBaseUrl: '/api/v1',
   appointmentsBaseUrl: '/api/v1', 
   usersBaseUrl: '/api/v1',
